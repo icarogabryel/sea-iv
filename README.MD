@@ -37,3 +37,7 @@ Labels are used to mark locations in the program. A label is a sequence of alpha
 ### Pointers
 
 A pointer is used to refer to memory locations in the program. A pointer is a sequence of alphanumeric characters that ends with a colon. For example, `vector:` is a pointer.
+
+### Comments
+
+Comments are used to document the program. A comment starts with a semicolon and ends at the end of the line. For example, `; This is a comment.` is a comment.
