@@ -54,11 +54,14 @@ class Scanner:
         number = ''
         
         while True:
-            number += self.getCurrentChar()
-            self.advance()
-
             if self.isEOF() or self.getCurrentChar() in IGNORED_CHARS:
                 break
+
+            if not self.getCurrentChar().isdecimal():
+                break
+            
+            number += self.getCurrentChar()
+            self.advance()
         
         return int(number)
 
