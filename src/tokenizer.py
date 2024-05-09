@@ -83,7 +83,7 @@ class Tokenizer:
                 raise Exception('Invalid directive: ' + lexeme)
 
         if lexeme[0] == '_': # Check if the lexeme is a label
-            if all(char in ALPHABET for char in lexeme[1:]):
+            if all(char in LETTERS for char in lexeme[1:]):
                 return 'label'
             else:
                 raise Exception('Invalid label: ' + lexeme)
