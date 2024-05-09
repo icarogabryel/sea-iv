@@ -6,6 +6,26 @@ SEA M - Syntax-Encoding Assembler (For MOON) is a simple assembler for the MOON 
 
 The MOON IV assembly language is a low-level programming language that is used to write programs for the MOON IV ISA. The MOON IV assembly language is a human-readable representation of the machine code that is executed by the MOON IV processor. In this language, we have instructions, pseudo-instructions, directives, labels and pointers.
 
+### Grammar
+
+The grammar of the MOON IV assembly language is defined as follows:
+
+```
+asmCode -> textField
+
+textField -> '.text' labelInstList
+
+labelInstList -> labelInst labelInstList
+               | ε
+
+labelInst -> label
+           | inst
+
+label -> labelID ':'
+
+inst -> instID
+```
+
 ### Instructions
 
 Instructions are the basic building blocks of a program. An instruction is a command that tells the processor to perform a specific operation.

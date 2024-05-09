@@ -1,10 +1,10 @@
-from scanner import Scanner
+from tokenizer import Tokenizer
 
 
 def main():
-    input = '76 54'
+    input = '.text _Gerg  _ergrg'
 
-    s = Scanner(input)
+    s = Tokenizer(input)
 
     print(s.getTokenStream())
 
