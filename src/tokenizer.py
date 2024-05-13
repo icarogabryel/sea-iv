@@ -2,7 +2,7 @@ IGNORED_CHARS = ' \n\t'
 NUMBERS = '0123456789'
 LETTERS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 SYMBOLS = ',:'
-MARKS = '._' # Marks are used to indicate labels and directives to the assembler
+MARKS = '._&$' # Marks are used to indicate labels and directives to the assembler
 ALPHABET = NUMBERS + LETTERS + SYMBOLS + MARKS
 TOKEN_ENDS = IGNORED_CHARS + SYMBOLS
 DIRECTIVES = ['.text']
@@ -98,11 +98,19 @@ class Tokenizer:
             else:
                 raise Exception('Invalid directive: ' + lexeme)
 
-        if lexeme[0] == '_': # Check if the lexeme is a label
+        elif lexeme[0] == '_': # Check if the lexeme is a label
             if all(char in LETTERS for char in lexeme[1:]):
                 return 'label'
             else:
                 raise Exception('Invalid label: ' + lexeme)
+
+        elif lexeme[0] == '&':
+            if (registerNumber := int(lexeme[1:])) == 0:
+                raise Exception('Register &0 is reserved for the assembler.')
+            elif registerNumber in range(1, 16):
+                return 'acRegister'
+            else:
+                raise Exception('Invalid AC register: ' + lexeme)
 
         if (lowerLexeme := lexeme.lower()) in INSTRUCTIONS:
             return lowerLexeme

@@ -2,7 +2,7 @@ from tokenizer import Tokenizer
 
 
 def main():
-    input = '.text _loop:, add _ifTrue:'
+    input = '.text _loop, add &15 _ifTrue:'
 
     s = Tokenizer(input)
 
