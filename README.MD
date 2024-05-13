@@ -15,10 +15,10 @@ asmCode -> textField
 
 textField -> '.text' labelInstList
 
-labelInstList -> labelInst labelInstList
+labelInstList -> labelOrInst labelInstList
                | ε
 
-labelInst -> label
+labelOrInst -> label
            | inst
 
 label -> labelID ':'

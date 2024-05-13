@@ -1,3 +1,6 @@
+from util import INSTRUCTIONS
+
+
 IGNORED_CHARS = ' \n\t'
 NUMBERS = '0123456789'
 LETTERS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -6,8 +9,6 @@ MARKS = '._&$' # Marks are used to indicate the assembler
 ALPHABET = NUMBERS + LETTERS + SYMBOLS + MARKS
 TOKEN_ENDS = IGNORED_CHARS + SYMBOLS
 DIRECTIVES = ['.text']
-TYPE_R_INSTRUCTIONS = ['add', 'sub']
-INSTRUCTIONS = TYPE_R_INSTRUCTIONS
 
 
 class Tokenizer:
