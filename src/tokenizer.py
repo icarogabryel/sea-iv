@@ -6,7 +6,8 @@ MARKS = '._&$' # Marks are used to indicate the assembler
 ALPHABET = NUMBERS + LETTERS + SYMBOLS + MARKS
 TOKEN_ENDS = IGNORED_CHARS + SYMBOLS
 DIRECTIVES = ['.text']
-INSTRUCTIONS = ['add', 'sub']
+TYPE_R_INSTRUCTIONS = ['add', 'sub']
+INSTRUCTIONS = TYPE_R_INSTRUCTIONS
 
 
 class Tokenizer:
