@@ -23,7 +23,10 @@ labelInst -> label
 
 label -> labelID ':'
 
-inst -> instID
+inst -> typeRInst
+
+typeRInst -> typeRMnemonic acReg ',' rfReg ',' rfReg
+
 ```
 
 ### Instructions

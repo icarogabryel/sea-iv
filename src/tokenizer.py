@@ -2,7 +2,7 @@ IGNORED_CHARS = ' \n\t'
 NUMBERS = '0123456789'
 LETTERS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 SYMBOLS = ',:'
-MARKS = '._&$' # Marks are used to indicate labels and directives to the assembler
+MARKS = '._&$' # Marks are used to indicate the assembler
 ALPHABET = NUMBERS + LETTERS + SYMBOLS + MARKS
 TOKEN_ENDS = IGNORED_CHARS + SYMBOLS
 DIRECTIVES = ['.text']
@@ -81,9 +81,7 @@ class Tokenizer:
         return lexeme
     
     def getTokenLabel(self, lexeme: str) -> str:
-        # if lexeme.isnumeric(): # todo
-        #     return 'NUM'
-        if lexeme in SYMBOLS:
+        if lexeme in SYMBOLS: # Check if the lexeme is a symbol
             match lexeme:
                 case ',':
                     return 'comma'
@@ -108,18 +106,20 @@ class Tokenizer:
             if (registerNumber := int(lexeme[1:])) == 0:
                 raise Exception('Register &0 is reserved for the assembler.')
             elif registerNumber in range(1, 4):
-                return 'acRegister'
+                return 'acReg'
             else:
                 raise Exception('Invalid AC register: ' + lexeme)
             
         elif firstChar == '$': # Check if the lexeme is a RF register
             if (registerNumber := int(lexeme[1:])) in range(0, 16):
-                return 'rfRegister'
+                return 'rfReg'
             else:
                 raise Exception('Invalid RF register: ' + lexeme)
 
         if (lowerLexeme := lexeme.lower()) in INSTRUCTIONS:
             return lowerLexeme
+        
+        raise Exception('Invalid lexeme: ' + lexeme)
         
     def getTokenStream(self) -> list:
         return self.tokenStream
