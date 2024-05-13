@@ -74,7 +74,7 @@ class Tokenizer:
                 break
             
             if self.getCurrentChar() not in ALPHABET: # Check if the character is valid
-                raise Exception('Invalid character: ' + self.getCurrentChar())
+                raise Exception('Lexical Error - Invalid character: ' + self.getCurrentChar())
             
             lexeme += self.getCurrentChar()
             self.advance()
@@ -89,38 +89,38 @@ class Tokenizer:
                 case ':':
                     return 'colon'
                 case _:
-                    raise Exception('How did you get here? :O - Please report this issue on GitHub.')
+                    raise Exception('Lexical Error - How did you get here? :O - Please report this issue on GitHub.')
 
         if (firstChar := lexeme[0]) == '.': # Check if the lexeme is a directive
             if (lowerLexeme := lexeme.lower()) in DIRECTIVES:
                 return lowerLexeme
             else:
-                raise Exception('Invalid directive: ' + lexeme)
+                raise Exception('Lexical Error - Invalid directive: ' + lexeme)
 
         elif firstChar == '_': # Check if the lexeme is a label
             if all(char in LETTERS for char in lexeme[1:]):
                 return 'label'
             else:
-                raise Exception('Invalid label: ' + lexeme)
+                raise Exception('Lexical Error - Invalid label: ' + lexeme)
 
         elif firstChar == '&': # Check if the lexeme is a AC register
             if (registerNumber := int(lexeme[1:])) == 0:
-                raise Exception('Register &0 is reserved for the assembler.')
+                raise Exception('Lexical Error - Register &0 is reserved for the assembler.')
             elif registerNumber in range(1, 4):
                 return 'acReg'
             else:
-                raise Exception('Invalid AC register: ' + lexeme)
+                raise Exception('Lexical Error - Invalid AC register: ' + lexeme)
             
         elif firstChar == '$': # Check if the lexeme is a RF register
             if (registerNumber := int(lexeme[1:])) in range(0, 16):
                 return 'rfReg'
             else:
-                raise Exception('Invalid RF register: ' + lexeme)
+                raise Exception('Lexical Error - Invalid RF register: ' + lexeme)
 
         if (lowerLexeme := lexeme.lower()) in INSTRUCTIONS:
             return lowerLexeme
         
-        raise Exception('Invalid lexeme: ' + lexeme)
+        raise Exception('Lexical Error - Invalid lexeme: ' + lexeme)
         
     def getTokenStream(self) -> list:
         return self.tokenStream
