@@ -1,4 +1,4 @@
-from tokenizer import Tokenizer
+from asmTokenizer import Tokenizer
 
 
 def main():
