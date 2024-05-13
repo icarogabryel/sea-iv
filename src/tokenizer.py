@@ -92,25 +92,31 @@ class Tokenizer:
                 case _:
                     raise Exception('How did you get here? :O - Please report this issue on GitHub.')
 
-        if lexeme[0] == '.': # Check if the lexeme is a directive
+        if (firstChar := lexeme[0]) == '.': # Check if the lexeme is a directive
             if (lowerLexeme := lexeme.lower()) in DIRECTIVES:
                 return lowerLexeme
             else:
                 raise Exception('Invalid directive: ' + lexeme)
 
-        elif lexeme[0] == '_': # Check if the lexeme is a label
+        elif firstChar == '_': # Check if the lexeme is a label
             if all(char in LETTERS for char in lexeme[1:]):
                 return 'label'
             else:
                 raise Exception('Invalid label: ' + lexeme)
 
-        elif lexeme[0] == '&':
+        elif firstChar == '&': # Check if the lexeme is a AC register
             if (registerNumber := int(lexeme[1:])) == 0:
                 raise Exception('Register &0 is reserved for the assembler.')
-            elif registerNumber in range(1, 16):
+            elif registerNumber in range(1, 4):
                 return 'acRegister'
             else:
                 raise Exception('Invalid AC register: ' + lexeme)
+            
+        elif firstChar == '$': # Check if the lexeme is a RF register
+            if (registerNumber := int(lexeme[1:])) in range(0, 16):
+                return 'rfRegister'
+            else:
+                raise Exception('Invalid RF register: ' + lexeme)
 
         if (lowerLexeme := lexeme.lower()) in INSTRUCTIONS:
             return lowerLexeme
