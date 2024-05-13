@@ -6,6 +6,7 @@ MARKS = '._' # Marks are used to indicate labels and directives to the assembler
 ALPHABET = NUMBERS + LETTERS + SYMBOLS + MARKS
 TOKEN_ENDS = IGNORED_CHARS + SYMBOLS
 DIRECTIVES = ['.text']
+INSTRUCTIONS = ['add', 'sub']
 
 
 class Tokenizer:
@@ -82,11 +83,17 @@ class Tokenizer:
     def getTokenLabel(self, lexeme: str) -> str:
         # if lexeme.isnumeric(): # todo
         #     return 'NUM'
-        
-        if lexeme[0] == '.': # Check if the lexeme is a directive
-            lowerLexeme = lexeme.lower()
+        if lexeme in SYMBOLS:
+            match lexeme:
+                case ',':
+                    return 'comma'
+                case ':':
+                    return 'colon'
+                case _:
+                    raise Exception('How did you get here? :O - Please report this issue on GitHub.')
 
-            if lowerLexeme in DIRECTIVES:
+        if lexeme[0] == '.': # Check if the lexeme is a directive
+            if (lowerLexeme := lexeme.lower()) in DIRECTIVES:
                 return lowerLexeme
             else:
                 raise Exception('Invalid directive: ' + lexeme)
@@ -96,15 +103,9 @@ class Tokenizer:
                 return 'label'
             else:
                 raise Exception('Invalid label: ' + lexeme)
-            
-        if lexeme in SYMBOLS:
-            match lexeme:
-                case ',':
-                    return 'comma'
-                case ':':
-                    return 'colon'
-                case _:
-                    raise Exception('How did you get here? :O Please report this issue on GitHub.')
 
+        if (lowerLexeme := lexeme.lower()) in INSTRUCTIONS:
+            return lowerLexeme
+        
     def getTokenStream(self) -> list:
         return self.tokenStream
