@@ -2,7 +2,7 @@ from tokenizer import Tokenizer
 
 
 def main():
-    input = '.text _Gerg  _ergrg'
+    input = '.text _Gerg:  _ergrg:'
 
     s = Tokenizer(input)
 
