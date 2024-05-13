@@ -1,9 +1,12 @@
-IGNORED_CHARS = [' ', '\n', '\t']
+IGNORED_CHARS = ' \n\t'
 NUMBERS = '0123456789'
 LETTERS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-SYMBOLS = '_.:'
-ALPHABET = NUMBERS + LETTERS + SYMBOLS
+SYMBOLS = ',:'
+MARKS = '._' # Marks are used to indicate labels and directives to the assembler
+ALPHABET = NUMBERS + LETTERS + SYMBOLS + MARKS
+TOKEN_ENDS = IGNORED_CHARS + SYMBOLS
 DIRECTIVES = ['.text']
+
 
 class Tokenizer:
     def __init__(self, asmCode: str) -> None:
@@ -58,8 +61,14 @@ class Tokenizer:
     def getLexeme(self) -> str: # Get lexeme
         lexeme = ''
   
-        while True:
-            if self.isEOF() or self.getCurrentChar() in IGNORED_CHARS: # Read characters until a whitespace, end token or EOF is found # todo: add token ends
+        if self.getCurrentChar() in SYMBOLS: # Check if the character is a symbol
+            lexeme += self.getCurrentChar()
+            self.advance()
+            
+            return lexeme
+        
+        while True: # Start reading characters to form a lexeme
+            if self.isEOF() or self.getCurrentChar() in TOKEN_ENDS: # Read characters until a token ends symbol or EOF is found
                 break
             
             if self.getCurrentChar() not in ALPHABET: # Check if the character is valid
@@ -83,11 +92,19 @@ class Tokenizer:
                 raise Exception('Invalid directive: ' + lexeme)
 
         if lexeme[0] == '_': # Check if the lexeme is a label
-
-            if all(char in LETTERS for char in lexeme[1:-1]) and lexeme[-1] == ':':
+            if all(char in LETTERS for char in lexeme[1:]):
                 return 'label'
             else:
                 raise Exception('Invalid label: ' + lexeme)
+            
+        if lexeme in SYMBOLS:
+            match lexeme:
+                case ',':
+                    return 'comma'
+                case ':':
+                    return 'colon'
+                case _:
+                    raise Exception('How did you get here? :O Please report this issue on GitHub.')
 
     def getTokenStream(self) -> list:
         return self.tokenStream
