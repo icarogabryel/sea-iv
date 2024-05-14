@@ -6,6 +6,9 @@ class Node:
         self.nodeType = nodeType
         self.children = []
 
+    def __repr__(self) -> str:
+        return self.nodeType + ' -> ' + str(self.children)
+
     def addChild(self, child) -> None:
         self.children.append(child)
 
@@ -46,9 +49,8 @@ class Parser:
         return node
     
     def textField(self) -> Node:
-        node = Node('.text')
-
         if self.getCurrentToken()[0] == '.text':
+            node = Node('Text Field')
             self.advance()
             node.addChildren(self.labelInstList())
         else:
@@ -58,24 +60,42 @@ class Parser:
     
     def labelInstList(self) -> Node:
         children = []
-        
-        children.append(self.labelOrInst())
 
-        if (tempChildrenList := self.labelInstList()) is not None:
-            children.extend(tempChildrenList)
+        if self.getCurrentToken()[0] in INSTRUCTIONS or self.getCurrentToken()[0] == 'label':
+            children.append(self.labelOrInst())
+
+            if (tempChildrenList := self.labelInstList()) is not None:
+                children.extend(tempChildrenList)
+            
+            return None if children == [] else children
         
-        
-        return None if children == [] else children
+        return None
     
     def labelOrInst(self) -> Node:
         if self.getCurrentToken()[0] in INSTRUCTIONS:
-            self.advance()
-            return self.instruction()
+            return self.inst()
         
         elif self.getCurrentToken()[0] == 'label':
-            self.advance()
             return self.label()
         
         else:
             raise Exception('Syntactical Error - Unexpected token. Expected instruction or label. Got ' + self.getCurrentToken()[0])
+        
+    def inst(self) -> Node:
+        node = Node('instruction')
 
+        self.advance()
+        
+        return node
+
+    def label(self) -> Node:
+        node = Node('label')
+
+        self.advance()
+
+        if self.getCurrentToken()[0] == 'colon':
+            self.advance()
+        else:
+            raise Exception('Syntactical Error - Expected : after label. Got ' + self.getCurrentToken()[0])
+        
+        return node

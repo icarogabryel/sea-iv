@@ -1,12 +1,14 @@
 from asmTokenizer import Tokenizer
+from asmParser import Parser
 
 
 def main():
-    input = '.text _loop, add  sub $3 &2 _ifTrue:'
+    input = '.text _loop: add  sub _ifTrue:'
 
-    s = Tokenizer(input)
+    tokenizer = Tokenizer(input)
+    parser = Parser(tokenizer.getTokenStream())
 
-    print(s.getTokenStream())
+    print(parser.getAst())
 
 
 if __name__ == '__main__': main()
