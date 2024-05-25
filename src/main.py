@@ -3,11 +3,12 @@ from asmParser import Parser
 
 
 def main():
-    input = '.text _loop: add  sub _ifTrue:'
+    input = '.text add _loop: sub'
 
     tokenizer = Tokenizer(input)
-    parser = Parser(tokenizer.getTokenStream())
+    print(tokenizer.getTokenStream())
 
+    parser = Parser(tokenizer.getTokenStream())
     print(parser.getAst())
 
 

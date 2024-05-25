@@ -43,7 +43,7 @@ class Parser:
     def asmCode(self) -> Node:
         node = Node('asmCode')
 
-        if self.getCurrentToken()[0] == '.text':
+        if self.getCurrentToken()[0] == '.text': # todo - add more sections
             node.addChild(self.textField())
         
         return node
@@ -52,50 +52,46 @@ class Parser:
         if self.getCurrentToken()[0] == '.text':
             node = Node('Text Field')
             self.advance()
-            node.addChildren(self.labelInstList())
         else:
-            raise Exception('Unexpected token. Expected .text. Got ' + self.getCurrentToken()[0])
+            raise Exception('Syntactical error - unexpected token. Expected .text. Got ' + self.getCurrentToken()[0])
+
+        if (instList := self.instList()) is not None:
+            node.addChildren(instList)
         
         return node
-    
-    def labelInstList(self) -> Node:
-        children = []
 
-        if self.getCurrentToken()[0] in INSTRUCTIONS or self.getCurrentToken()[0] == 'label':
-            children.append(self.labelOrInst())
+    def instList(self) -> Node:
+        instList = []
 
-            if (tempChildrenList := self.labelInstList()) is not None:
-                children.extend(tempChildrenList)
-            
-            return None if children == [] else children
-        
-        return None
-    
-    def labelOrInst(self) -> Node:
         if self.getCurrentToken()[0] in INSTRUCTIONS:
-            return self.inst()
+            instList.append(self.inst())
         
         elif self.getCurrentToken()[0] == 'label':
-            return self.label()
-        
-        else:
-            raise Exception('Syntactical Error - Unexpected token. Expected instruction or label. Got ' + self.getCurrentToken()[0])
-        
+            instList.append(self.labelDec())
+            instList.append(self.inst())
+
+        if self.getCurrentToken()[0] in INSTRUCTIONS or self.getCurrentToken()[0] == 'label':
+            instList.extend(self.instList())
+            
+        return instList
+    
     def inst(self) -> Node:
-        node = Node('instruction')
+        if self.getCurrentToken()[0] in INSTRUCTIONS:
+            node = Node('instruction')
+            self.advance()
+            
+            return node
 
-        self.advance()
-        
-        return node
+        else:
+            raise Exception('Syntactical Error - Unexpected token. Expected instruction or label declaration. Got ' + self.getCurrentToken()[0])
 
-    def label(self) -> Node:
-        node = Node('label')
-
+    def labelDec(self) -> Node:
+        node = Node('labelDec')
         self.advance()
 
         if self.getCurrentToken()[0] == 'colon':
             self.advance()
         else:
-            raise Exception('Syntactical Error - Expected : after label. Got ' + self.getCurrentToken()[0])
+            raise Exception('Syntactical Error - Expected : after label declaration. Got ' + self.getCurrentToken()[0])
         
         return node

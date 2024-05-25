@@ -1,27 +1,25 @@
 # SEA M
 
-SEA M - Syntax-Encoding Assembler (For MOON) is a simple assembler for the MOON IV ISA. It is written in Python 3 and is a command-line tool.
+SEA M - Syntax-Encoding Assembler (For MOOn) is a simple assembler for the MOOn IV ISA. It is written in Python 3 and is a command-line tool.
 
-## MOON IV Assembly Language
+## MOOn IV Assembly Language
 
-The MOON IV assembly language is a low-level programming language that is used to write programs for the MOON IV ISA. The MOON IV assembly language is a human-readable representation of the machine code that is executed by the MOON IV processor. In this language, we have instructions, pseudo-instructions, directives, labels and pointers.
+The MOOn IV assembly language is a low-level programming language that is used to write programs for the MOOn IV ISA. The MOOn IV assembly language is a human-readable representation of the machine code that is executed by the MOOn IV processor. In this language, we have instructions, pseudo-instructions, directives, labels and pointers.
 
 ### Grammar
 
-The grammar of the MOON IV assembly language is defined as follows:
+The grammar of the MOOn IV assembly language is defined as follows:
 
 ```
+
 asmCode -> textField
 
-textField -> '.text' labelInstList
+textField -> '.text' instList
 
-labelInstList -> labelOrInst labelInstList
-               | ε
+instList -> (inst|labelDec inst) instList
+          | ε
 
-labelOrInst -> label
-           | inst
-
-label -> labelID ':'
+labelDec -> labelID ':'
 
 inst -> typeRInst
 
@@ -35,7 +33,7 @@ Instructions are the basic building blocks of a program. An instruction is a com
 
 ### Pseudo-Instructions
 
-Pseudo-instructions are special commands that are used to simplify the writing of programs. They are not part of the MOON IV ISA. The following pseudo-instructions are supported:
+Pseudo-instructions are special commands that are used to simplify the writing of programs. They are not part of the MOOn IV ISA. The following pseudo-instructions are supported:
 
 - call
 - ret
@@ -46,7 +44,7 @@ Pseudo-instructions are special commands that are used to simplify the writing o
 
 ### Directives
 
-Directives are special commands that are used to control the assembler, orientations to the assembling process. They are not part of the MOON IV ISA. The following directives are supported:
+Directives are special commands that are used to control the assembler, orientations to the assembling process. They are not part of the MOOn IV ISA. The following directives are supported:
 
 - .include
 - .data
