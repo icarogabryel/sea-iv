@@ -1,5 +1,4 @@
-from util import INSTRUCTIONS
-
+from util import INSTRUCTIONS, R_TYPE_INSTRUCTIONS
 
 class Node:
     def __init__(self, type, lexeme = '\0') -> None:
@@ -80,12 +79,9 @@ class Parser:
         return instList
     
     def inst(self) -> Node:
-        if (currentToken := self.getCurrentToken()[0]) in INSTRUCTIONS: # todo - add inst types
-
-            node = Node('instruction', self.getCurrentToken()[1])
-            self.advance()
-            
-            return node
+        if (currentToken := self.getCurrentToken()[0]) in INSTRUCTIONS:
+            if currentToken in R_TYPE_INSTRUCTIONS:
+                return self.rTypeInst()
 
         else:
             raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected instruction. Got "' + currentToken + '"')
@@ -99,9 +95,55 @@ class Parser:
                 self.advance()
             
             else:
-                raise Exception('Syntactical Error - Expected : after label declaration. Got ' + self.getCurrentToken()[0])
+                raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected ":" after label declaration. Got "' + self.getCurrentToken()[0] + '"')
        
         else:
-            raise Exception('Syntactical Error - Expected label declaration. Got ' + currentToken)
+            raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected label declaration. Got "' + currentToken + '"')
         
         return node
+    
+    def rTypeInst(self) -> Node:
+        if (currentToken := self.getCurrentToken()[0]) in R_TYPE_INSTRUCTIONS:
+            node = Node('rTypeInst', currentToken)
+            self.advance()
+
+            node.addChildren(self.acReg())
+
+            if self.getCurrentToken()[0] == 'comma':
+                self.advance()
+            else:
+                raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected , after AC register. Got ' + self.getCurrentToken()[0] + '"')
+            
+            node.addChildren(self.rfReg())
+
+            if self.getCurrentToken()[0] == 'comma':
+                self.advance()
+            else:
+                raise Exception('SYNTACTICAL ERROR: Unexpected token.Expected , after AC register. Got ' + self.getCurrentToken()[0] + '"')
+            
+            node.addChildren(self.rfReg())
+
+            return node
+
+        else:
+            raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected R-Type instruction. Got ' + currentToken + '"')
+        
+    def acReg(self) -> Node:
+        if (currentToken := self.getCurrentToken()[0]) == 'acReg':
+            node = Node('acReg', self.getCurrentToken()[1][1:])
+            self.advance()
+
+            return node
+        
+        else:
+            raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected AC register. Got ' + currentToken + '"')
+        
+    def rfReg(self) -> Node:
+        if (currentToken := self.getCurrentToken()[0]) == 'rfReg':
+            node = Node('rfReg', self.getCurrentToken()[1][1:])
+            self.advance()
+
+            return node
+        
+        else:
+            raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected RF register. Got ' + currentToken + '"')

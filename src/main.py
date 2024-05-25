@@ -3,7 +3,7 @@ from asmParser import Parser
 
 
 def main():
-    input = '.text add _loop: sub'
+    input = '.text _loop: add &2, $1, $2'
 
     tokenizer = Tokenizer(input)
     print(tokenizer.getTokenStream())
