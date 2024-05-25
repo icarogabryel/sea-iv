@@ -2,18 +2,19 @@ from util import INSTRUCTIONS
 
 
 class Node:
-    def __init__(self, nodeType) -> None:
-        self.nodeType = nodeType
+    def __init__(self, type, lexeme = '\0') -> None:
+        self.type = type
+        self.lexeme = lexeme
         self.children = []
 
     def __repr__(self) -> str:
-        return self.nodeType + ' -> ' + str(self.children)
+        return f'{self.type}({self.lexeme}) -> {self.children}'
 
-    def addChild(self, child) -> None:
-        self.children.append(child)
-
-    def addChildren(self, children) -> None:
-        self.children.extend(children)
+    def addChildren(self, child) -> None:
+        if type(child) is list:
+            self.children.extend(child)
+        else:
+            self.children.append(child)
 
 
 class Parser:
@@ -21,7 +22,7 @@ class Parser:
         self.tokenStream = tokenStream
         self.index = 0
 
-        self.ast = Node
+        self.ast = None
 
         self.parse()
 
@@ -43,8 +44,10 @@ class Parser:
     def asmCode(self) -> Node:
         node = Node('asmCode')
 
-        if self.getCurrentToken()[0] == '.text': # todo - add more sections
-            node.addChild(self.textField())
+        # if (currentToken := self.getCurrentToken()[0]) == '.data': # todo: create data section
+
+        if (currentToken := self.getCurrentToken()[0]) == '.text':
+            node.addChildren(self.textField())
         
         return node
     
@@ -52,8 +55,9 @@ class Parser:
         if self.getCurrentToken()[0] == '.text':
             node = Node('Text Field')
             self.advance()
+
         else:
-            raise Exception('Syntactical error - unexpected token. Expected .text. Got ' + self.getCurrentToken()[0])
+            raise Exception('SYNTACTICAL ERROR: unexpected token. Expected ".text". Got "' + self.getCurrentToken()[0] + '"')
 
         if (instList := self.instList()) is not None:
             node.addChildren(instList)
@@ -72,26 +76,32 @@ class Parser:
 
         if self.getCurrentToken()[0] in INSTRUCTIONS or self.getCurrentToken()[0] == 'label':
             instList.extend(self.instList())
-            
+
         return instList
     
     def inst(self) -> Node:
-        if self.getCurrentToken()[0] in INSTRUCTIONS:
-            node = Node('instruction')
+        if (currentToken := self.getCurrentToken()[0]) in INSTRUCTIONS: # todo - add inst types
+
+            node = Node('instruction', self.getCurrentToken()[1])
             self.advance()
             
             return node
 
         else:
-            raise Exception('Syntactical Error - Unexpected token. Expected instruction or label declaration. Got ' + self.getCurrentToken()[0])
+            raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected instruction. Got "' + currentToken + '"')
 
     def labelDec(self) -> Node:
-        node = Node('labelDec')
-        self.advance()
-
-        if self.getCurrentToken()[0] == 'colon':
+        if (currentToken := self.getCurrentToken()[0]) == 'label':
+            node = Node('labelDec', self.getCurrentToken()[1])
             self.advance()
+
+            if self.getCurrentToken()[0] == 'colon':
+                self.advance()
+            
+            else:
+                raise Exception('Syntactical Error - Expected : after label declaration. Got ' + self.getCurrentToken()[0])
+       
         else:
-            raise Exception('Syntactical Error - Expected : after label declaration. Got ' + self.getCurrentToken()[0])
+            raise Exception('Syntactical Error - Expected label declaration. Got ' + currentToken)
         
         return node
