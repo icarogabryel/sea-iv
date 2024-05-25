@@ -113,7 +113,9 @@ class Tokenizer:
                 raise Exception('Lexical Error - Invalid AC register: ' + lexeme)
             
         elif firstChar == '$': # Check if the lexeme is a RF register
-            if (registerNumber := int(lexeme[1:])) in range(0, 16):
+            if (registerNumber := int(lexeme[1:])) == 0:
+                raise Exception('Lexical Error - Register $0 is reserved for the assembler.')
+            elif registerNumber in range(1, 16):
                 return 'rfReg'
             else:
                 raise Exception('Lexical Error - Invalid RF register: ' + lexeme)
