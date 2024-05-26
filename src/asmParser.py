@@ -1,9 +1,10 @@
 from util import INSTRUCTIONS, R_TYPE_INSTRUCTIONS
 
+
 class Node:
-    def __init__(self, type, lexeme = '\0') -> None:
+    def __init__(self, type, lexeme: str = '\0') -> None:
         self.type = type
-        self.lexeme = lexeme
+        self.lexeme: str = lexeme
         self.children = []
 
     def __repr__(self) -> str:
@@ -71,7 +72,6 @@ class Parser:
         
         elif self.getCurrentToken()[0] == 'label':
             instList.append(self.labelDec())
-            instList.append(self.inst())
 
         if self.getCurrentToken()[0] in INSTRUCTIONS or self.getCurrentToken()[0] == 'label':
             instList.extend(self.instList())
@@ -81,7 +81,7 @@ class Parser:
     def inst(self) -> Node:
         if (currentToken := self.getCurrentToken()[0]) in INSTRUCTIONS:
             if currentToken in R_TYPE_INSTRUCTIONS:
-                return self.rTypeInst()
+                return self.inst()
 
         else:
             raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected instruction. Got "' + currentToken + '"')
@@ -93,6 +93,8 @@ class Parser:
 
             if self.getCurrentToken()[0] == 'colon':
                 self.advance()
+
+                node.addChildren(self.inst())
             
             else:
                 raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected ":" after label declaration. Got "' + self.getCurrentToken()[0] + '"')
@@ -102,9 +104,9 @@ class Parser:
         
         return node
     
-    def rTypeInst(self) -> Node:
+    def inst(self) -> Node:
         if (currentToken := self.getCurrentToken()[0]) in R_TYPE_INSTRUCTIONS:
-            node = Node('rTypeInst', currentToken)
+            node = Node('inst', currentToken)
             self.advance()
 
             node.addChildren(self.acReg())
