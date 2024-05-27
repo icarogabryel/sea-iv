@@ -14,14 +14,21 @@ def main():
         input = f.read()
 
     tokenizer = Tokenizer(input)
-    print(tokenizer.getTokenStream())
+    
+    print('TOKEN STREAM:\n')
+    for token in tokenizer.getTokenStream():
+        print(token)
     print('\n')
 
     parser = Parser(tokenizer.getTokenStream())
+    
+    print('AST:\n')
     printAST(parser.getAst())
+    print('\n')
 
+    print('OBJ CODE:\n')
     generator = Generator(parser.getAst())
-    print(generator.getObjCode())
-
+    for line in generator.getObjCode():
+        print(line)
 
 if __name__ == '__main__': main()

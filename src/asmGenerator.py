@@ -7,7 +7,7 @@ class Line:
         self.label = ''
 
     def __repr__(self) -> str:
-        return self.label + ' - ' + self.inst + '\n'
+        return f'{self.label + ' ' * (8 - len(self.label))} | {self.inst}'
 
 
 class Generator:
