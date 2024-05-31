@@ -5,7 +5,7 @@ class Node:
     def __init__(self, type, lexeme: str = '\0') -> None:
         self.type = type
         self.lexeme: str = lexeme
-        self.children = []
+        self.children: list[Node] = []
 
     def __repr__(self) -> str:
         return f'{self.type}({self.lexeme}) -> {self.children}'

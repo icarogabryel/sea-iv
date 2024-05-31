@@ -11,7 +11,7 @@ TOKEN_ENDS = IGNORED_CHARS + SYMBOLS
 DIRECTIVES = ['.text']
 
 
-class Tokenizer:
+class Lexer:
     def __init__(self, asmCode: str) -> None:
         self.asmCode = asmCode
         self.tokenStream = []
