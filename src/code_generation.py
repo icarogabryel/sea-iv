@@ -1,5 +1,10 @@
 from asm_parser import Node
 
+OPCODES = {'add': '000001', 'sub': '000010'}
+INST_FUNC = [lambda: RTypeInst]
+
+def decToBin(dec):
+    return bin(int(dec))
 
 class Line:
     def __init__(self) -> None:
@@ -20,7 +25,7 @@ def asmCode(node: Node) -> list[Line]:
             lines += textField(child)
 
     return lines
-    
+
 def textField(node: Node) -> str:
     if node.type == 'Text Field':
         lines = []
@@ -41,13 +46,13 @@ def inst(node: Node) -> Line:
     if (type := node.type) == 'inst':
         line = Line()
 
-        opcode = node.lexeme
+        opcode = OPCODES[node.lexeme.lower()]
 
         ac = acReg(node.children[0])
         rf1 = rfReg(node.children[1])
         rf2 = rfReg(node.children[2])
 
-        line.inst = opcode.lower() + ' ' + ac + ', ' + rf1 + ', ' + rf2
+        line.inst = opcode + ac + rf1 + rf2
         
         return line
     
@@ -56,22 +61,22 @@ def inst(node: Node) -> Line:
     
 def acReg(node: Node) -> str:
     if (type := node.type) == 'acReg':
-        return node.lexeme
+        return decToBin(node.lexeme)[2:].zfill(2)
     
     else:
         raise Exception('SEMANTICAL ERROR: Expected "acReg". Got "' + type + '"')
     
 def rfReg(node: Node) -> str:
     if (type := node.type) == 'rfReg':
-        return node.lexeme
+        return decToBin(node.lexeme)[2:].zfill(4)
     
     else:
         raise Exception('SEMANTICAL ERROR: Expected "rfReg". Got "' + type + '"')
     
-def label(Node: Node) -> str:
-    if (type := Node.type) == 'labelDec':
-        line = inst(Node.children[0])
-        line.label = Node.lexeme
+def label(node: Node) -> str:
+    if (type := node.type) == 'labelDec':
+        line = inst(node.children[0])
+        line.label = node.lexeme
 
         return line
     

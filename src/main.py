@@ -1,8 +1,8 @@
 from asm_lexer import Lexer
-from asm_parser import Parser
+from asm_parser import Parser, Node
 from code_generation import generate
 
-def printAST(ast, tab = 0):
+def printAST(ast: Node, tab = 0):
     print('\t' * tab + '-' + ast.type)
 
     for child in ast.children:
