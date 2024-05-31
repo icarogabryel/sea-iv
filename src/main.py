@@ -8,6 +8,7 @@ def printAST(ast, tab = 0):
     for child in ast.children:
         printAST(child, tab + 1)
 
+
 def main():
     with open('./doc/example.asm', 'r') as f:
         input = f.read()
@@ -29,5 +30,6 @@ def main():
     generator = generate(parser.getAst())
     for line in generator:
         print(line)
+
 
 if __name__ == '__main__': main()
