@@ -27,7 +27,7 @@ LABEL_ID = ? _[a-zA-Z][a-zA-Z_]* ? ;
 
 ```
 
-This grammar is defined using the Extended Backus-Naur Formalism (EBNF) with some terminals witted in Extended Regular Expressions Syntax (Marked in uppercase).
+This grammar is defined using the Extended Backus-Naur Formalism (EBNF) with some terminals witted in Extended Regular Expressions (ERE) Syntax (Marked in uppercase).
 
 ### Instructions
 
