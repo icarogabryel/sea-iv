@@ -13,8 +13,8 @@ The grammar of the MOOn IV assembly language is defined as follows:
 ```EBNF
 
 asmCode = [textField] ;
-textField = ".text", instList ;
-instList = (inst | labelDec inst), [instList] ;
+textField = ".text", instList .
+instList = (inst / labelDec inst), [instList] ;
 inst = rTypeInst ;
 rTypeInst = MNEMONIC, AC_REG, ",", RF_REG, ",", RG_REG ;
 labelDec = LABEL_ID, ':' ;
