@@ -14,13 +14,13 @@ The grammar of the MOOn IV assembly language is defined as follows:
 
 asmCode = [textField] ;
 textField = ".text", instList ;
-instList: (inst | labelDec inst), [instList] ;
+instList = (inst | labelDec inst), [instList] ;
 inst = rTypeInst ;
 rTypeInst = MNEMONIC, AC_REG, ",", RF_REG, ",", RG_REG ;
 labelDec = LABEL_ID, ':' ;
 
 (* Lexer rules (in uppercase) in regex *)
-MNEMONIC = ? [a-z]+ ? ;
+MNEMONIC = [a-z]+ ;
 AC_REG = ? &(0 | [1-9][0-9]*) ? ;
 RF_REG = ? $(0 | [1-9][0-9]*) ? ;
 LABEL_ID = ? _[a-zA-Z][a-zA-Z_]* ? ;
