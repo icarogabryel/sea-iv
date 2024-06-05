@@ -10,22 +10,24 @@ The MOOn IV assembly language is a low-level programming language that is used t
 
 The grammar of the MOOn IV assembly language is defined as follows:
 
+```EBNF
+
+asmCode = [textField] ;
+textField = ".text", instList ;
+instList: (inst | labelDec inst), [instList] ;
+inst = rTypeInst ;
+rTypeInst = MNEMONIC, AC_REG, ",", RF_REG, ",", RG_REG ;
+labelDec = LABEL_ID, ':' ;
+
+(* Lexer rules (in uppercase) in regex *)
+MNEMONIC = ? [a-z]+ ? ;
+AC_REG = ? &(0 | [1-9][0-9]*) ? ;
+RF_REG = ? $(0 | [1-9][0-9]*) ? ;
+LABEL_ID = ? _[a-zA-Z][a-zA-Z_]* ? ;
+
 ```
 
-asmCode -> textField
-
-textField -> '.text' instList
-
-instList -> (inst|labelDec inst) instList
-          | ε
-
-labelDec -> labelID ':'
-
-inst -> typeRInst
-
-typeRInst -> typeRMnemonic acReg ',' rfReg ',' rfReg
-
-```
+This grammar is defined using the Extended Backus-Naur Formalism (EBNF) with some terminals witted in Extended Regular Expressions Syntax (Marked in uppercase).
 
 ### Instructions
 
