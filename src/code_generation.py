@@ -1,10 +1,8 @@
-from asm_parser import Node
+from asm_parser import Node, R_TYPE_INSTRUCTIONS
+
 
 OPCODES = {'add': '000001', 'sub': '000010'}
-INST_FUNC = [lambda: RTypeInst]
 
-def decToBin(dec):
-    return bin(int(dec))
 
 class Line:
     def __init__(self) -> None:
@@ -14,8 +12,12 @@ class Line:
     def __repr__(self) -> str:
         return f'{self.label + ' ' * (8 - len(self.label))} | {self.inst}'
 
-def generate(ast) -> None:
-    return asmCode(ast) # todo: chance to accept multiple children
+
+def decToBin(dec):
+    return bin(dec)[2:]
+
+def generateMachineCode(ast) -> None:
+    return asmCode(ast)
     
 def asmCode(node: Node) -> list[Line]:
     lines = []
@@ -32,21 +34,29 @@ def textField(node: Node) -> str:
 
         for child in node.children:
             if child.type == 'inst':
-                lines.append(inst(child))
+                lines += inst(child)
             
             elif child.type == 'labelDec':
-                lines.append(label(child))
+                lines += label(child)
 
         return lines
     
     else:
-        raise Exception('SEMANTICAL ERROR: Expected "Text Field". Got "' + Node.type + '"')
+        raise Exception('SEMANTICAL ERROR - Expected "Text Field". Got "' + Node.type + '".')
     
-def inst(node: Node) -> Line:
+def inst(node: Node) -> list[Line]:
     if (type := node.type) == 'inst':
+        if (mnemonic := node.children[0].lexeme) in R_TYPE_INSTRUCTIONS:
+            return rTypeInst(node.children[0])
+    
+    else:
+        raise Exception('SEMANTICAL ERROR - Expected "inst". Got "' + type + '".')
+
+def rTypeInst(node: Node) -> list[Line]:
+    if (type := node.type) == 'rTypeInst':
         line = Line()
 
-        opcode = OPCODES[node.lexeme.lower()]
+        opcode = OPCODES[node.lexeme]
 
         ac = acReg(node.children[0])
         rf1 = rfReg(node.children[1])
@@ -54,31 +64,57 @@ def inst(node: Node) -> Line:
 
         line.inst = opcode + ac + rf1 + rf2
         
-        return line
+        return [line]
     
     else:
-        raise Exception('SEMANTICAL ERROR: Expected "inst". Got "' + type + '"')
-    
+        raise Exception('SEMANTICAL ERROR - Expected "rTypeInst". Got "' + type + '".')
+
 def acReg(node: Node) -> str:
     if (type := node.type) == 'acReg':
-        return decToBin(node.lexeme)[2:].zfill(2)
+        addr = int(node.lexeme[1:])
+
+        if addr == 1:
+            raise Exception('SEMANTICAL ERROR - AC register 1 is reserved for the assembler.')
+        
+        elif addr not in [0, 2, 3]:
+            raise Exception('SEMANTICAL ERROR - AC register address out of bounds.')
+        else:
+            return decToBin(addr).zfill(2)
     
     else:
-        raise Exception('SEMANTICAL ERROR: Expected "acReg". Got "' + type + '"')
+        raise Exception('SEMANTICAL ERROR - Expected "acReg". Got "' + type + '".')
     
 def rfReg(node: Node) -> str:
     if (type := node.type) == 'rfReg':
-        return decToBin(node.lexeme)[2:].zfill(4)
+        addr = int(node.lexeme[1:])
+
+        if addr == 0:
+            raise Exception('SEMANTICAL ERROR - RF register 0 is read-only.')
+        
+        elif addr == 1:
+            raise Exception('SEMANTICAL ERROR - RF register 0 is reserved for the assembler.')
+        
+        elif addr == 14:
+            raise Exception('SEMANTICAL ERROR - RF register 14 is the stack pointer register.')
+        
+        elif addr == 15:
+            raise Exception('SEMANTICAL ERROR - RF register 15 is the link register.')
+        
+        elif addr not in range(2, 14):
+            raise Exception('SEMANTICAL ERROR - RF register address out of bounds.')
+        
+        else:
+            return decToBin(addr).zfill(4)
     
     else:
-        raise Exception('SEMANTICAL ERROR: Expected "rfReg". Got "' + type + '"')
+        raise Exception('SEMANTICAL ERROR - Expected "rfReg". Got "' + type + '".')
     
 def label(node: Node) -> str:
     if (type := node.type) == 'labelDec':
-        line = inst(node.children[0])
+        line = inst(node.children[0])[0]
         line.label = node.lexeme
 
-        return line
+        return [line]
     
     else:
-        raise Exception('SEMANTICAL ERROR: Expected "label". Got "' + type + '"')
+        raise Exception('SEMANTICAL ERROR - Expected "label". Got "' + type + '".')

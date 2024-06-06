@@ -1,12 +1,11 @@
-from util import INSTRUCTIONS
+import regex as re
 
 
 IGNORED_CHARS = ' \n\t'
 NUMBERS = '0123456789'
-LETTERS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+LETTERS = 'abcdefghijklmnopqrstuvwxyz'
 SYMBOLS = ',:'
-MARKS = '._&$' # Marks are used to indicate the assembler
-ALPHABET = NUMBERS + LETTERS + SYMBOLS + MARKS
+ALPHABET = NUMBERS + LETTERS + SYMBOLS + '._&$'
 TOKEN_ENDS = IGNORED_CHARS + SYMBOLS
 DIRECTIVES = ['.text']
 
@@ -36,7 +35,7 @@ class Lexer:
             if self.isEOF():
                 return ('EOF', self.getCurrentChar())
         
-        if self.getCurrentChar() == ';': # Ignore comments
+        if self.getCurrentChar() == '#': # Ignore comments
             while self.getCurrentChar() != '\n':
                 self.advance()
 
@@ -75,7 +74,7 @@ class Lexer:
                 break
             
             if self.getCurrentChar() not in ALPHABET: # Check if the character is valid
-                raise Exception('Lexical Error - Invalid character: ' + self.getCurrentChar())
+                raise Exception('LEXICAL ERROR - Invalid character: ' + self.getCurrentChar())
             
             lexeme += self.getCurrentChar()
             self.advance()
@@ -87,43 +86,36 @@ class Lexer:
             match lexeme:
                 case ',':
                     return 'comma'
+                
                 case ':':
                     return 'colon'
+                
                 case _:
-                    raise Exception('Lexical Error - How did you get here? :O - Please report this issue on GitHub.')
+                    raise Exception('LEXICAL ERROR - How did you get here? :O - Please report this issue on GitHub.')
 
-        if (firstChar := lexeme[0]) == '.': # Check if the lexeme is a directive
-            if (lowerLexeme := lexeme.lower()) in DIRECTIVES:
-                return lowerLexeme
-            else:
-                raise Exception('Lexical Error - Invalid directive: ' + lexeme)
-
-        elif firstChar == '_': # Check if the lexeme is a label
-            if all(char in LETTERS for char in lexeme[1:]):
-                return 'label'
-            else:
-                raise Exception('Lexical Error - Invalid label: ' + lexeme)
-
-        elif firstChar == '&': # Check if the lexeme is a AC register
-            if (registerNumber := int(lexeme[1:])) == 0:
-                raise Exception('Lexical Error - Register &0 is reserved for the assembler.')
-            elif registerNumber in range(1, 4):
-                return 'acReg'
-            else:
-                raise Exception('Lexical Error - Invalid AC register: ' + lexeme)
-            
-        elif firstChar == '$': # Check if the lexeme is a RF register
-            if (registerNumber := int(lexeme[1:])) == 0:
-                raise Exception('Lexical Error - Register $0 is reserved for the assembler.')
-            elif registerNumber in range(1, 16):
-                return 'rfReg'
-            else:
-                raise Exception('Lexical Error - Invalid RF register: ' + lexeme)
-
-        if (lowerLexeme := lexeme.lower()) in INSTRUCTIONS:
-            return lowerLexeme
+        elif lexeme in DIRECTIVES:
+            match lexeme:
+                case '.data':
+                    return 'data_dir'
+                case '.text':
+                    return 'text_dir'
+                case _:
+                    raise Exception('LEXICAL ERROR - How did you get here? :O - Please report this issue on GitHub.')
         
-        raise Exception('Lexical Error - Invalid lexeme: ' + lexeme)
+        elif bool(re.match(r'^_[a-z0-9_]+$', lexeme)): # Check if the lexeme is a label
+            return 'label'
+        
+        elif bool(re.match(r'^[a-z]+$', lexeme)): # Check if the lexeme is a mnemonic
+            return 'mnemonic'
+        
+        elif bool(re.match(r'^&(0|[1-9][0-9]*)$', lexeme)): # Check if the lexeme is an AC register
+            return 'acReg'
+        
+        elif bool(re.match(r'^\$(0|[1-9][0-9]*)$', lexeme)): # Check if the lexeme is a RF register
+            return 'rfReg'
+        
+        else:
+            raise Exception('LEXICAL ERROR - Invalid lexeme: ' + lexeme)
         
     def getTokenStream(self) -> list:
         return self.tokenStream

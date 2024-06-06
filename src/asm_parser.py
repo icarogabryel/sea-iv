@@ -1,4 +1,5 @@
-from util import INSTRUCTIONS, R_TYPE_INSTRUCTIONS
+R_TYPE_INSTRUCTIONS = ['add', 'sub']
+INSTRUCTIONS = R_TYPE_INSTRUCTIONS
 
 
 class Node:
@@ -46,13 +47,13 @@ class Parser:
 
         # if (currentToken := self.getCurrentToken()[0]) == '.data': # todo: create data section
 
-        if (currentToken := self.getCurrentToken()[0]) == '.text':
+        if (currentToken := self.getCurrentToken()[0]) == 'text_dir':
             node.addChildren(self.textField())
         
         return node
     
     def textField(self) -> Node:
-        if self.getCurrentToken()[0] == '.text':
+        if self.getCurrentToken()[0] == 'text_dir':
             node = Node('Text Field')
             self.advance()
 
@@ -67,46 +68,35 @@ class Parser:
     def instList(self) -> Node:
         instList = []
 
-        if self.getCurrentToken()[0] in INSTRUCTIONS:
+        if self.getCurrentToken()[0] == 'mnemonic':
             instList.append(self.inst())
         
         elif self.getCurrentToken()[0] == 'label':
             instList.append(self.labelDec())
 
-        if self.getCurrentToken()[0] in INSTRUCTIONS or self.getCurrentToken()[0] == 'label':
+        if (self.getCurrentToken()[1] == 'mnemonic') or (self.getCurrentToken()[0] == 'label'):
             instList.extend(self.instList())
 
         return instList
     
     def inst(self) -> Node:
-        if (currentToken := self.getCurrentToken()[0]) in INSTRUCTIONS:
-            if currentToken in R_TYPE_INSTRUCTIONS:
-                return self.inst()
+        node = Node('inst')
 
-        else:
-            raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected instruction. Got "' + currentToken + '"')
-
-    def labelDec(self) -> Node:
-        if (currentToken := self.getCurrentToken()[0]) == 'label':
-            node = Node('labelDec', self.getCurrentToken()[1])
-            self.advance()
-
-            if self.getCurrentToken()[0] == 'colon':
-                self.advance()
-
-                node.addChildren(self.inst())
-            
+        if (tokenLabel := self.getCurrentToken()[0])  == 'mnemonic':
+            if (tokenLexeme := self.getCurrentToken()[1]) in R_TYPE_INSTRUCTIONS:
+                node.addChildren(self.rTypeInst())
+                
+                return node
+            # todo: add more instruction types here
             else:
-                raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected ":" after label declaration. Got "' + self.getCurrentToken()[0] + '"')
-       
+                raise Exception('SYNTACTICAL ERROR - Invalid mnemonic. Got "' + tokenLexeme + '"')
+
         else:
-            raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected label declaration. Got "' + currentToken + '"')
-        
-        return node
-    
-    def inst(self) -> Node:
-        if (currentToken := self.getCurrentToken()[0]) in R_TYPE_INSTRUCTIONS:
-            node = Node('inst', currentToken)
+            raise Exception('SYNTACTICAL ERROR - Expected mnemonic. Got "' + tokenLabel + '"')
+
+    def rTypeInst(self) -> Node:
+        if (tokenlexeme := self.getCurrentToken()[1]) in R_TYPE_INSTRUCTIONS:
+            node = Node('rTypeInst', tokenlexeme)
             self.advance()
 
             node.addChildren(self.acReg())
@@ -128,11 +118,29 @@ class Parser:
             return node
 
         else:
-            raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected R-Type instruction. Got ' + currentToken + '"')
+            raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected R-Type instruction. Got ' + tokenlexeme + '"')
+
+    def labelDec(self) -> Node:
+        if (currentToken := self.getCurrentToken()[0]) == 'label':
+            node = Node('labelDec', self.getCurrentToken()[1])
+            self.advance()
+
+            if self.getCurrentToken()[0] == 'colon':
+                self.advance()
+
+                node.addChildren(self.inst())
+            
+            else:
+                raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected ":" after label declaration. Got "' + self.getCurrentToken()[0] + '"')
+       
+        else:
+            raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected label declaration. Got "' + currentToken + '"')
+        
+        return node
         
     def acReg(self) -> Node:
         if (currentToken := self.getCurrentToken()[0]) == 'acReg':
-            node = Node('acReg', self.getCurrentToken()[1][1:])
+            node = Node('acReg', self.getCurrentToken()[1])
             self.advance()
 
             return node
@@ -142,7 +150,7 @@ class Parser:
         
     def rfReg(self) -> Node:
         if (currentToken := self.getCurrentToken()[0]) == 'rfReg':
-            node = Node('rfReg', self.getCurrentToken()[1][1:])
+            node = Node('rfReg', self.getCurrentToken()[1])
             self.advance()
 
             return node

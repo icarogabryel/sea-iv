@@ -1,6 +1,7 @@
+import os
 from asm_lexer import Lexer
 from asm_parser import Parser, Node
-from code_generation import generate
+from code_generation import generateMachineCode
 
 def printAST(ast: Node, tab = 0):
     print('\t' * tab + '-' + ast.type)
@@ -15,7 +16,7 @@ def main():
 
     tokenizer = Lexer(input)
     
-    print('TOKEN STREAM:\n')
+    print('\nTOKEN STREAM:\n')
     for token in tokenizer.getTokenStream():
         print(token)
     print('\n')
@@ -27,9 +28,11 @@ def main():
     print('\n')
 
     print('OBJ CODE:\n')
-    generator = generate(parser.getAst())
+    generator = generateMachineCode(parser.getAst())
     for line in generator:
         print(line)
+
+    print('\n')
 
 
 if __name__ == '__main__': main()

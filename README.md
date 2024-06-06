@@ -1,14 +1,14 @@
-# SEA M
+# SEA-M
 
-SEA M - Syntax-Encoding Assembler (For MOOn) is a simple assembler for the MOOn IV ISA. It is written in Python 3 and is a command-line tool.
+SEA-M - Syntax-Encoding Assembler for MOOn-IV is a simple assembler for the MOOn-IV architecture. It is written in Python 3 and is a command-line tool.
 
-## MOOn IV Assembly Language
+## MOOn-IV Assembly Language
 
-The MOOn IV assembly language is a low-level programming language that is used to write programs for the MOOn IV ISA. The MOOn IV assembly language is a human-readable representation of the machine code that is executed by the MOOn IV processor. In this language, we have instructions, pseudo-instructions, directives, labels and pointers.
+The MOOn-IV assembly language is a low-level programming language that is used to write programs for the MOOn-IV. The MOOn IV assembly language is a human-readable representation of the machine code that is executed by the MOOn IV processor.
 
 ### Grammar
 
-The grammar of the MOOn IV assembly language is defined as follows:
+The grammar of the MOOn-IV assembly language is defined as follows:
 
 ```EBNF
 
@@ -17,50 +17,53 @@ textField = ".text", instList ;
 instList = (inst | labelDec inst), [instList] ;
 inst = rTypeInst ;
 rTypeInst = MNEMONIC, AC_REG, ",", RF_REG, ",", RG_REG ;
-labelDec = LABEL_ID, ':' ;
+labelDec = LABEL, ':' ;
 
-(* Lexer rules (in uppercase) in regex *)
-MNEMONIC = ? [ a-z]+ ? ;
-AC_REG = ? &(0 | [1-9][0-9]*) ? ;
-RF_REG = ? $(0 | [1-9][0-9]*) ? ;
-LABEL_ID = ? _[a-zA-Z][a-zA-Z_]* ? ;
+(* Lexical rules (in uppercase) in regex *)
+MNEMONIC = ? [a-z]+ ? ;
+AC_REG = ? &(0|[1-9][0-9]*) ? ;
+RF_REG = ? $(0|[1-9][0-9]*) ? ;
+LABEL = ? _[a-z0-9_]* ? ;
 
 ```
 
-This grammar is defined using the Extended Backus-Naur Formalism (EBNF) with some terminals witted in Extended Regular Expressions (ERE) Syntax (Marked in uppercase).
+This grammar is defined using the Extended Backus-Naur Formalism (EBNF) with some terminals witted in Extended Regular Expressions (ERE) Syntax.
 
-### Instructions
+### Language Element
 
-Instructions are the basic building blocks of a program. An instruction is a command that tells the processor to perform a specific operation.
+The MOOn-IV assembly language has instructions, pseudo-instructions, directives, labels and comments.
 
-### Pseudo-Instructions
+#### Instructions
+
+Instructions are the basic building blocks of a program. An instruction is a command that tells the processor to perform a specific operation. The MOOn-IV
+
+#### Pseudo-Instructions
 
 Pseudo-instructions are special commands that are used to simplify the writing of programs. They are not part of the MOOn IV ISA. The following pseudo-instructions are supported:
 
-- call
-- ret
 - div
 - mul
-- sw
-- lw
 
-### Directives
+#### Directives
 
 Directives are special commands that are used to control the assembler, orientations to the assembling process. They are not part of the MOOn IV ISA. The following directives are supported:
 
 - .include
 - .data
-- .text
+- .ascii
 - .word
 
-### Labels
+#### Labels
 
 Labels are used to mark locations in the program. A label is a sequence of alphanumeric characters that starts with underscore and ends with a colon. For example, `_loop:` is a label.
 
-### Pointers
+##### Comments
 
-A pointer is used to refer to memory locations in the program. A pointer is a sequence of alphanumeric characters that ends with a colon. For example, `vector:` is a pointer.
+Comments are used to document the program. A comment starts with a semicolon and ends at the end of the line. For example, `; This is a comment.` is a comment. <!-- todo: change to # -->
 
-### Comments
+<!-- todo: complete -->
+## Structure of the Assembler
 
-Comments are used to document the program. A comment starts with a semicolon and ends at the end of the line. For example, `; This is a comment.` is a comment.
+## Installation
+
+## Usage

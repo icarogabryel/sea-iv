@@ -1,3 +1,3 @@
 .text
-    add &1, $1, $2
-    _loop: sub &2, $3, $4
+    add &0, $2, $3
+    _loop: sub &2, $4, $5
