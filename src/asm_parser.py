@@ -11,11 +11,8 @@ class Node:
     def __repr__(self) -> str:
         return f'{self.type}({self.lexeme}) -> {self.children}'
 
-    def addChildren(self, child) -> None:
-        if type(child) is list:
-            self.children.extend(child)
-        else:
-            self.children.append(child)
+    def addChild(self, child) -> None:
+        self.children.append(child)
 
 
 class Parser:
@@ -46,14 +43,14 @@ class Parser:
         node = Node('asmCode')
 
         if self.getCurrentToken()[0] == '.data':
-            node.addChildren(self.dataField())
+            node.addChild(self.dataField())
 
         if self.getCurrentToken()[0] == '.text':
-            node.addChildren(self.textField())
+            node.addChild(self.textField())
         
         return node
     
-    def dataField(self) -> list[Node]:
+    def dataField(self) -> Node:
         if self.getCurrentToken()[0] == '.data':
             node = Node('Data Field')
             self.advance()
@@ -62,27 +59,29 @@ class Parser:
             raise Exception('SYNTACTICAL ERROR: unexpected token. Expected ".data". Got "' + self.getCurrentToken()[0] + '"')
 
         if (dataList := self.dataList()) != []:
-            node.addChildren(dataList)
+            for data in dataList:
+                node.addChild(data)
         
-        return [node]
+        return node
     
     def dataList(self) -> list[Node]:
         dataList = []
 
         if (tokenLabel := self.getCurrentToken()[0]) in DATA_TYPES:
-            dataList.extend(DATA_TYPES[tokenLabel](self))
+            dataList.append(DATA_TYPES[tokenLabel](self))
         
         elif tokenLabel == 'label':
-            node = self.labelDec()[0]
-            node.addChildren(self.word())
+            node = self.labelDec()
+            node.addChild(self.word())
             dataList.append(node)
 
         if (self.getCurrentToken()[0] in DATA_TYPES ) or (self.getCurrentToken()[0] == 'label'):
-            dataList.extend(self.dataList())
+            for data in self.dataList():
+                dataList.append(data)
 
         return dataList
     
-    def word(self) -> list[Node]:
+    def word(self) -> Node:
         if (tokenLabel := self.getCurrentToken()[0]) == '.word':
             node = Node('Word')
             self.advance()
@@ -90,11 +89,11 @@ class Parser:
         else:
             raise Exception('SYNTACTICAL ERROR: unexpected token. Expected ".word". Got "' + tokenLabel + '"')
         
-        node.addChildren(self.number())
+        node.addChild(self.number())
 
-        return [node]
+        return node
     
-    def number(self) -> list[Node]:
+    def number(self) -> Node:
         if (tokenLabel := self.getCurrentToken()[0]) == 'number':
             node = Node('Number', self.getCurrentToken()[1])
             self.advance()
@@ -102,9 +101,9 @@ class Parser:
         else:
             raise Exception('SYNTACTICAL ERROR: unexpected token. Expected number. Got "' + tokenLabel + '"')
         
-        return [node]
+        return node
 
-    def textField(self) -> list[Node]:
+    def textField(self) -> Node:
         if self.getCurrentToken()[0] == '.text':
             node = Node('Text Field')
             self.advance()
@@ -113,32 +112,34 @@ class Parser:
             raise Exception('SYNTACTICAL ERROR: unexpected token. Expected ".text". Got "' + self.getCurrentToken()[0] + '"')
 
         if (instList := self.instList()) != []:
-            node.addChildren(instList)
+            for inst in instList:
+                node.addChild(inst)
         
-        return [node]
+        return node
 
     def instList(self) -> list[Node]:
         instList = []
 
         if self.getCurrentToken()[0] == 'mnemonic':
-            instList.extend(self.inst())
+            instList.append(self.inst())
         
         elif self.getCurrentToken()[0] == 'label':
-            node = self.labelDec()[0]
-            node.addChildren(self.inst())
+            node = self.labelDec()
+            node.addChild(self.inst())
             instList.append(node)
 
         if (self.getCurrentToken()[1] == 'mnemonic') or (self.getCurrentToken()[0] == 'label'):
-            instList.extend(self.instList())
+            for inst in self.instList():
+                instList.append(inst)
 
         return instList
     
-    def inst(self) -> list[Node]:
+    def inst(self) -> Node:
         node = Node('inst')
 
         if (tokenLabel := self.getCurrentToken()[0])  == 'mnemonic':
             if (tokenLexeme := self.getCurrentToken()[1]) in R_TYPE_INSTRUCTIONS:
-                node.addChildren(self.rTypeInst())
+                node.addChild(self.rTypeInst())
 
             # todo: add more instruction types here
             else:
@@ -147,35 +148,35 @@ class Parser:
         else:
             raise Exception('SYNTACTICAL ERROR - Expected mnemonic. Got "' + tokenLabel + '"')
         
-        return [node]
+        return node
 
-    def rTypeInst(self) -> list[Node]:
+    def rTypeInst(self) -> Node:
         if (tokenlexeme := self.getCurrentToken()[1]) in R_TYPE_INSTRUCTIONS:
             node = Node('rTypeInst', tokenlexeme)
             self.advance()
 
-            node.addChildren(self.acReg())
+            node.addChild(self.acReg())
 
             if self.getCurrentToken()[0] == 'comma':
                 self.advance()
             else:
                 raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected , after AC register. Got ' + self.getCurrentToken()[0] + '"')
             
-            node.addChildren(self.rfReg())
+            node.addChild(self.rfReg())
 
             if self.getCurrentToken()[0] == 'comma':
                 self.advance()
             else:
                 raise Exception('SYNTACTICAL ERROR: Unexpected token.Expected , after AC register. Got ' + self.getCurrentToken()[0] + '"')
             
-            node.addChildren(self.rfReg())
+            node.addChild(self.rfReg())
 
-            return [node]
+            return node
 
         else:
             raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected R-Type instruction. Got ' + tokenlexeme + '"')
 
-    def labelDec(self) -> list[Node]:
+    def labelDec(self) -> Node:
         if (tokenLabel := self.getCurrentToken()[0]) == 'label':
             node = Node('labelDec', self.getCurrentToken()[1])
             self.advance()
@@ -189,9 +190,9 @@ class Parser:
         else:
             raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected label declaration. Got "' + tokenLabel + '"')
         
-        return [node]
+        return node
         
-    def acReg(self) -> list[Node]:
+    def acReg(self) -> Node:
         if (tokenLabel := self.getCurrentToken()[0]) == 'acReg':
             node = Node('acReg', self.getCurrentToken()[1])
             self.advance()
@@ -199,9 +200,9 @@ class Parser:
         else:
             raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected AC register. Got ' + tokenLabel + '"')
         
-        return [node]
+        return node
         
-    def rfReg(self) -> list[Node]:
+    def rfReg(self) -> Node:
         if (tokenLabel := self.getCurrentToken()[0]) == 'rfReg':
             node = Node('rfReg', self.getCurrentToken()[1])
             self.advance()
@@ -209,4 +210,4 @@ class Parser:
         else:
             raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected RF register. Got ' + tokenLabel + '"')
         
-        return [node]
+        return node
