@@ -1,7 +1,11 @@
 from asm_parser import Node, R_TYPE_INSTRUCTIONS
 
 
-OPCODES = {'add': '000001', 'sub': '000010'}
+OPCODES = {
+    'add': '000001',
+    'sub': '000010',
+    'and': '000011',
+}
 
 
 class Line:

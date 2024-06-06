@@ -12,14 +12,24 @@ The grammar of the MOOn-IV assembly language is defined as follows:
 
 ```EBNF
 
-asmCode = [textField] ;
+asmCode = [dataField], [textField] ;
+
+dataFIeld = ".data", dataList ;
+dataList = (data | labelDec data), [dataList] ;
+data = word ;
+
+word = ".word", NUMBER ;
+
 textField = ".text", instList ;
 instList = (inst | labelDec inst), [instList] ;
 inst = rTypeInst ;
+
 rTypeInst = MNEMONIC, AC_REG, ",", RF_REG, ",", RG_REG ;
+
 labelDec = LABEL, ':' ;
 
 (* Lexical rules (in uppercase) in regex *)
+NUMBER = ? 0|[1-9][0-9]* ? ;
 MNEMONIC = ? [a-z]+ ? ;
 AC_REG = ? &(0|[1-9][0-9]*) ? ;
 RF_REG = ? $(0|[1-9][0-9]*) ? ;
@@ -52,6 +62,7 @@ Directives are special commands that are used to control the assembler, orientat
 - .data
 - .ascii
 - .word
+- .text
 
 #### Labels
 
@@ -59,7 +70,7 @@ Labels are used to mark locations in the program. A label is a sequence of alpha
 
 ##### Comments
 
-Comments are used to document the program. A comment starts with a semicolon and ends at the end of the line. For example, `; This is a comment.` is a comment. <!-- todo: change to # -->
+Comments are used to document the program. A comment starts with a semicolon and ends at the end of the line. For example, `; This is a comment.` is a comment.
 
 <!-- todo: complete -->
 ## Structure of the Assembler

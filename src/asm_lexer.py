@@ -7,7 +7,7 @@ LETTERS = 'abcdefghijklmnopqrstuvwxyz'
 SYMBOLS = ',:'
 ALPHABET = NUMBERS + LETTERS + SYMBOLS + '._&$'
 TOKEN_ENDS = IGNORED_CHARS + SYMBOLS
-DIRECTIVES = ['.text']
+DIRECTIVES = ['.data', '.word', '.text']
 
 
 class Lexer:
@@ -94,13 +94,10 @@ class Lexer:
                     raise Exception('LEXICAL ERROR - How did you get here? :O - Please report this issue on GitHub.')
 
         elif lexeme in DIRECTIVES:
-            match lexeme:
-                case '.data':
-                    return 'data_dir'
-                case '.text':
-                    return 'text_dir'
-                case _:
-                    raise Exception('LEXICAL ERROR - How did you get here? :O - Please report this issue on GitHub.')
+            return lexeme
+        
+        elif bool(re.match(r'^[0-9]+$', lexeme)): # Check if the lexeme is a number
+            return 'number'
         
         elif bool(re.match(r'^_[a-z0-9_]+$', lexeme)): # Check if the lexeme is a label
             return 'label'

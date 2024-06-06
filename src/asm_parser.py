@@ -1,6 +1,6 @@
+DATA_TYPES = {'.word': lambda self: Parser.word(self)}
 R_TYPE_INSTRUCTIONS = ['add', 'sub']
 INSTRUCTIONS = R_TYPE_INSTRUCTIONS
-
 
 class Node:
     def __init__(self, type, lexeme: str = '\0') -> None:
@@ -45,56 +45,111 @@ class Parser:
     def asmCode(self) -> Node:
         node = Node('asmCode')
 
-        # if (currentToken := self.getCurrentToken()[0]) == '.data': # todo: create data section
+        if self.getCurrentToken()[0] == '.data':
+            node.addChildren(self.dataField())
 
-        if (currentToken := self.getCurrentToken()[0]) == 'text_dir':
+        if self.getCurrentToken()[0] == '.text':
             node.addChildren(self.textField())
         
         return node
     
-    def textField(self) -> Node:
-        if self.getCurrentToken()[0] == 'text_dir':
+    def dataField(self) -> list[Node]:
+        if self.getCurrentToken()[0] == '.data':
+            node = Node('Data Field')
+            self.advance()
+
+        else:
+            raise Exception('SYNTACTICAL ERROR: unexpected token. Expected ".data". Got "' + self.getCurrentToken()[0] + '"')
+
+        if (dataList := self.dataList()) != []:
+            node.addChildren(dataList)
+        
+        return [node]
+    
+    def dataList(self) -> list[Node]:
+        dataList = []
+
+        if (tokenLabel := self.getCurrentToken()[0]) in DATA_TYPES:
+            dataList.extend(DATA_TYPES[tokenLabel](self))
+        
+        elif tokenLabel == 'label':
+            node = self.labelDec()[0]
+            node.addChildren(self.word())
+            dataList.append(node)
+
+        if (self.getCurrentToken()[0] in DATA_TYPES ) or (self.getCurrentToken()[0] == 'label'):
+            dataList.extend(self.dataList())
+
+        return dataList
+    
+    def word(self) -> list[Node]:
+        if (tokenLabel := self.getCurrentToken()[0]) == '.word':
+            node = Node('Word')
+            self.advance()
+        
+        else:
+            raise Exception('SYNTACTICAL ERROR: unexpected token. Expected ".word". Got "' + tokenLabel + '"')
+        
+        node.addChildren(self.number())
+
+        return [node]
+    
+    def number(self) -> list[Node]:
+        if (tokenLabel := self.getCurrentToken()[0]) == 'number':
+            node = Node('Number', self.getCurrentToken()[1])
+            self.advance()
+
+        else:
+            raise Exception('SYNTACTICAL ERROR: unexpected token. Expected number. Got "' + tokenLabel + '"')
+        
+        return [node]
+
+    def textField(self) -> list[Node]:
+        if self.getCurrentToken()[0] == '.text':
             node = Node('Text Field')
             self.advance()
 
         else:
             raise Exception('SYNTACTICAL ERROR: unexpected token. Expected ".text". Got "' + self.getCurrentToken()[0] + '"')
 
-        if (instList := self.instList()) is not None:
+        if (instList := self.instList()) != []:
             node.addChildren(instList)
         
-        return node
+        return [node]
 
-    def instList(self) -> Node:
+    def instList(self) -> list[Node]:
         instList = []
 
         if self.getCurrentToken()[0] == 'mnemonic':
-            instList.append(self.inst())
+            instList.extend(self.inst())
         
         elif self.getCurrentToken()[0] == 'label':
-            instList.append(self.labelDec())
+            node = self.labelDec()[0]
+            node.addChildren(self.inst())
+            instList.append(node)
 
         if (self.getCurrentToken()[1] == 'mnemonic') or (self.getCurrentToken()[0] == 'label'):
             instList.extend(self.instList())
 
         return instList
     
-    def inst(self) -> Node:
+    def inst(self) -> list[Node]:
         node = Node('inst')
 
         if (tokenLabel := self.getCurrentToken()[0])  == 'mnemonic':
             if (tokenLexeme := self.getCurrentToken()[1]) in R_TYPE_INSTRUCTIONS:
                 node.addChildren(self.rTypeInst())
-                
-                return node
+
             # todo: add more instruction types here
             else:
                 raise Exception('SYNTACTICAL ERROR - Invalid mnemonic. Got "' + tokenLexeme + '"')
 
         else:
             raise Exception('SYNTACTICAL ERROR - Expected mnemonic. Got "' + tokenLabel + '"')
+        
+        return [node]
 
-    def rTypeInst(self) -> Node:
+    def rTypeInst(self) -> list[Node]:
         if (tokenlexeme := self.getCurrentToken()[1]) in R_TYPE_INSTRUCTIONS:
             node = Node('rTypeInst', tokenlexeme)
             self.advance()
@@ -115,45 +170,43 @@ class Parser:
             
             node.addChildren(self.rfReg())
 
-            return node
+            return [node]
 
         else:
             raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected R-Type instruction. Got ' + tokenlexeme + '"')
 
-    def labelDec(self) -> Node:
-        if (currentToken := self.getCurrentToken()[0]) == 'label':
+    def labelDec(self) -> list[Node]:
+        if (tokenLabel := self.getCurrentToken()[0]) == 'label':
             node = Node('labelDec', self.getCurrentToken()[1])
             self.advance()
 
             if self.getCurrentToken()[0] == 'colon':
                 self.advance()
-
-                node.addChildren(self.inst())
             
             else:
                 raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected ":" after label declaration. Got "' + self.getCurrentToken()[0] + '"')
        
         else:
-            raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected label declaration. Got "' + currentToken + '"')
+            raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected label declaration. Got "' + tokenLabel + '"')
         
-        return node
+        return [node]
         
-    def acReg(self) -> Node:
-        if (currentToken := self.getCurrentToken()[0]) == 'acReg':
+    def acReg(self) -> list[Node]:
+        if (tokenLabel := self.getCurrentToken()[0]) == 'acReg':
             node = Node('acReg', self.getCurrentToken()[1])
             self.advance()
 
-            return node
-        
         else:
-            raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected AC register. Got ' + currentToken + '"')
+            raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected AC register. Got ' + tokenLabel + '"')
         
-    def rfReg(self) -> Node:
-        if (currentToken := self.getCurrentToken()[0]) == 'rfReg':
+        return [node]
+        
+    def rfReg(self) -> list[Node]:
+        if (tokenLabel := self.getCurrentToken()[0]) == 'rfReg':
             node = Node('rfReg', self.getCurrentToken()[1])
             self.advance()
-
-            return node
         
         else:
-            raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected RF register. Got ' + currentToken + '"')
+            raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected RF register. Got ' + tokenLabel + '"')
+        
+        return [node]
