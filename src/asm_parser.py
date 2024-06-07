@@ -91,6 +91,15 @@ class Parser:
         
         node.addChild(self.number())
 
+        currentToken = self.getCurrentToken()
+
+        while currentToken[0] == 'comma':
+            self.advance()
+
+            node.addChild(self.number())
+
+            currentToken = self.getCurrentToken()
+
         return node
     
     def number(self) -> Node:

@@ -18,7 +18,7 @@ dataFIeld = ".data", dataList ;
 dataList = (data | labelDec data), [dataList] ;
 data = word ;
 
-word = ".word", NUMBER ;
+word = ".word", NUMBER {"," NUMBER} ;
 
 textField = ".text", instList ;
 instList = (inst | labelDec inst), [instList] ;
