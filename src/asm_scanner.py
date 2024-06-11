@@ -10,7 +10,7 @@ TOKEN_ENDS = IGNORED_CHARS + SYMBOLS
 DIRECTIVES = ['.data', '.word', '.text']
 
 
-class Lexer:
+class Scanner:
     def __init__(self, asmCode: str) -> None:
         self.asmCode = asmCode
         self.tokenStream = []

@@ -1,6 +1,6 @@
-from asm_lexer import Lexer
+from asm_scanner import Scanner
 from asm_parser import Parser, Node
-from code_generation import generateMachineCode
+from code_visitor import generateMachineCode
 
 
 def printAST(ast: Node, tab = 0):
@@ -13,7 +13,7 @@ def main():
     with open('./doc/example.asm', 'r') as f:
         input = f.read()
 
-    tokenizer = Lexer(input)
+    tokenizer = Scanner(input)
     
     print('\nTOKEN STREAM:\n')
     for token in tokenizer.getTokenStream():

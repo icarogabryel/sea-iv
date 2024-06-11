@@ -1,6 +1,6 @@
-# SEA-M
+# SEA-IV
 
-SEA-M - Syntax-Encoding Assembler for MOOn-IV is a simple assembler for the MOOn-IV architecture. It is written in Python 3 and is a command-line tool.
+SEA-IV - Syntax-Encoding Assembler for MOOn-IV is a simple assembler for the MOOn-IV architecture. It is written in Python 3 and is a command-line tool.
 
 ## MOOn-IV Assembly Language
 
