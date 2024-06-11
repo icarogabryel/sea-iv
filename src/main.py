@@ -1,6 +1,6 @@
 from asm_scanner import Scanner
 from asm_parser import Parser, Node
-from code_visitor import generateMachineCode
+from asm_visitor import Visitor
 
 
 def printAST(ast: Node, tab = 0):
@@ -26,12 +26,13 @@ def main():
     printAST(parser.getAst())
     print('\n')
 
-    # print('OBJ CODE:\n')
-    # generator = generateMachineCode(parser.getAst())
-    # for line in generator:
-    #     print(line)
+    print('OBJ CODE:\n')
+    visitor = Visitor(parser.getAst())
+    
+    for line in visitor.getMachineCode():
+        print(line)
 
-    # print('\n')
+    print('\n')
 
 
 if __name__ == '__main__': main()
