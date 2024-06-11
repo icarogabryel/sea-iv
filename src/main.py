@@ -1,4 +1,3 @@
-import os
 from asm_lexer import Lexer
 from asm_parser import Parser, Node
 from code_generation import generateMachineCode
