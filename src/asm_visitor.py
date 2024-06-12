@@ -10,11 +10,12 @@ OPCODES = {
 
 class Line:
     def __init__(self) -> None:
-        self.inst = ''
+        self.word = ''
         self.label = ''
 
     def __repr__(self) -> str:
-        return f'{self.label + ' ' * (8 - len(self.label))} | {self.inst}'
+        return f'{self.label + ' ' * (8 - len(self.label))} | {self.word}'
+
 
 class Visitor:
     def __init__(self, root: Node) -> None:
@@ -24,6 +25,10 @@ class Visitor:
             "Word": self.word,
             "Number": self.number,
             "Text Field": self.textField,
+            "inst": self.inst,
+            "rTypeInst": self.rTypeInst,
+            "acReg": self.acReg,
+            "rfReg": self.rfReg,
             "labelDec": self.label
         }
         
@@ -65,14 +70,68 @@ class Visitor:
         
         else:
             line = Line()
-            line.inst = lexemeInBinary.zfill(16)
+            line.word = lexemeInBinary.zfill(16)
             
             return [line]
 
-    def textField(SELF, node: Node) -> list[Line]:
-        pass
+    def textField(self, node: Node) -> list[Line]:
+        code = []
 
-    def label(self, node: Node) -> str:
+        for child in node.children:
+            code += self.visit(child)
+
+        return code
+    
+    def inst(self, node: Node) -> list[Line]: # todo: take off to put directly the instruction type
+        return self.visit(node.children[0])
+    
+    def rTypeInst(self, node: Node) -> list[Line]:
+        line = Line()
+
+        opcode = OPCODES[node.lexeme]
+
+        ac = self.visit(node.children[0])
+        rf1 = self.visit(node.children[1])
+        rf2 = self.visit(node.children[2])
+
+        line.word = opcode + ac + rf1 + rf2
+
+        return [line]
+    
+    def acReg(self, node: Node) -> str:
+        addr = int(node.lexeme[1:])
+
+        if addr == 1:
+            raise Exception('SEMANTICAL ERROR - AC register 1 is reserved for the assembler.')
+        
+        elif addr not in [0, 2, 3]:
+            raise Exception('SEMANTICAL ERROR - AC register address out of bounds.')
+        
+        else:
+            return bin(int(addr))[2:].zfill(2)
+        
+    def rfReg(self, node: Node) -> str:
+        addr = int(node.lexeme[1:])
+
+        if addr == 0:
+            raise Exception('SEMANTICAL ERROR - RF register 0 is read-only.') #! Probably error here
+        
+        elif addr == 1:
+            raise Exception('SEMANTICAL ERROR - RF register 0 is reserved for the assembler.')
+        
+        elif addr == 14:
+            raise Exception('SEMANTICAL ERROR - RF register 14 is the stack pointer register.')
+        
+        elif addr == 15:
+            raise Exception('SEMANTICAL ERROR - RF register 15 is the link register.')
+        
+        elif addr not in range(2, 14):
+            raise Exception('SEMANTICAL ERROR - RF register address out of bounds.')
+        
+        else:
+            return bin(int(addr))[2:].zfill(4)
+
+    def label(self, node: Node) -> list[Line]:
         code = self.visit(node.children[0])
 
         code[0].label = node.lexeme
