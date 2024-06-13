@@ -1,4 +1,3 @@
-DATA_TYPES = {'.word': lambda self: Parser.word(self)}
 R_TYPE_INSTRUCTIONS = ['add', 'sub']
 INSTRUCTIONS = R_TYPE_INSTRUCTIONS
 
@@ -19,6 +18,7 @@ class Parser:
     def __init__(self, tokenStream: list) -> None:
         self.tokenStream = tokenStream
         self.index = 0
+        self.DATA_TYPES = {'.word': self.word}
 
         self.ast = None
 
@@ -67,14 +67,14 @@ class Parser:
     def dataList(self) -> list[Node]:
         dataList = []
 
-        if (tokenLabel := self.getCurrentToken()[0]) in DATA_TYPES:
-            dataList.append(DATA_TYPES[tokenLabel](self))
+        if (tokenLabel := self.getCurrentToken()[0]) in self.DATA_TYPES:
+            dataList.append(self.DATA_TYPES[tokenLabel]())
         
         elif tokenLabel == 'label':
             dataList.append(self.labelDec())
             dataList.append(self.word())
 
-        if (self.getCurrentToken()[0] in DATA_TYPES ) or (self.getCurrentToken()[0] == 'label'):
+        if (self.getCurrentToken()[0] in self.DATA_TYPES) or (self.getCurrentToken()[0] == 'label'):
             for data in self.dataList():
                 dataList.append(data)
 
