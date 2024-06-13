@@ -26,13 +26,13 @@ def main():
     printAST(parser.getAst())
     print('\n')
 
-    print('OBJ CODE:\n')
-    visitor = Visitor(parser.getAst())
+    # print('OBJ CODE:\n')
+    # visitor = Visitor(parser.getAst())
     
-    for line in visitor.getMachineCode():
-        print(line)
+    # for line in visitor.getMachineCode():
+    #     print(line)
 
-    print('\n')
+    # print('\n')
 
 
 if __name__ == '__main__': main()

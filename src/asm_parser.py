@@ -40,7 +40,7 @@ class Parser:
         self.ast = self.asmCode()
 
     def asmCode(self) -> Node:
-        node = Node('asmCode')
+        node = Node('Program')
 
         if self.getCurrentToken()[0] == '.data':
             node.addChild(self.dataField())
@@ -71,9 +71,8 @@ class Parser:
             dataList.append(DATA_TYPES[tokenLabel](self))
         
         elif tokenLabel == 'label':
-            node = self.labelDec()
-            node.addChild(self.word())
-            dataList.append(node)
+            dataList.append(self.labelDec())
+            dataList.append(self.word())
 
         if (self.getCurrentToken()[0] in DATA_TYPES ) or (self.getCurrentToken()[0] == 'label'):
             for data in self.dataList():
@@ -133,9 +132,8 @@ class Parser:
             instList.append(self.inst())
         
         elif self.getCurrentToken()[0] == 'label':
-            node = self.labelDec()
-            node.addChild(self.inst())
-            instList.append(node)
+            instList.append(self.labelDec())
+            instList.append(self.inst())
 
         if (self.getCurrentToken()[1] == 'mnemonic') or (self.getCurrentToken()[0] == 'label'):
             for inst in self.instList():
@@ -144,11 +142,9 @@ class Parser:
         return instList
     
     def inst(self) -> Node:
-        node = Node('inst')
-
         if (tokenLabel := self.getCurrentToken()[0])  == 'mnemonic':
             if (tokenLexeme := self.getCurrentToken()[1]) in R_TYPE_INSTRUCTIONS:
-                node.addChild(self.rTypeInst())
+                return self.rTypeInst()
 
             # todo: add more instruction types here
             else:
@@ -156,12 +152,10 @@ class Parser:
 
         else:
             raise Exception('SYNTACTICAL ERROR - Expected mnemonic. Got "' + tokenLabel + '"')
-        
-        return node
 
     def rTypeInst(self) -> Node:
         if (tokenlexeme := self.getCurrentToken()[1]) in R_TYPE_INSTRUCTIONS:
-            node = Node('rTypeInst', tokenlexeme)
+            node = Node('R Type Inst', tokenlexeme)
             self.advance()
 
             node.addChild(self.acReg())
@@ -187,7 +181,7 @@ class Parser:
 
     def labelDec(self) -> Node:
         if (tokenLabel := self.getCurrentToken()[0]) == 'label':
-            node = Node('labelDec', self.getCurrentToken()[1])
+            node = Node('Label Dec', self.getCurrentToken()[1])
             self.advance()
 
             if self.getCurrentToken()[0] == 'colon':
@@ -203,7 +197,7 @@ class Parser:
         
     def acReg(self) -> Node:
         if (tokenLabel := self.getCurrentToken()[0]) == 'acReg':
-            node = Node('acReg', self.getCurrentToken()[1])
+            node = Node('AC Reg', self.getCurrentToken()[1])
             self.advance()
 
         else:
@@ -213,7 +207,7 @@ class Parser:
         
     def rfReg(self) -> Node:
         if (tokenLabel := self.getCurrentToken()[0]) == 'rfReg':
-            node = Node('rfReg', self.getCurrentToken()[1])
+            node = Node('RF Reg', self.getCurrentToken()[1])
             self.advance()
         
         else:
