@@ -1,3 +1,4 @@
+DATA_TYPES = ['wordDir']
 R_TYPE_INSTRUCTIONS = ['add', 'sub']
 INSTRUCTIONS = R_TYPE_INSTRUCTIONS
 
@@ -18,7 +19,6 @@ class Parser:
     def __init__(self, tokenStream: list) -> None:
         self.tokenStream = tokenStream
         self.index = 0
-        self.DATA_TYPES = {'.word': self.word}
 
         self.ast = None
 
@@ -42,16 +42,16 @@ class Parser:
     def asmCode(self) -> Node:
         node = Node('Program')
 
-        if self.getCurrentToken()[0] == '.data':
+        if self.getCurrentToken()[0] == 'dataDir':
             node.addChild(self.dataField())
 
-        if self.getCurrentToken()[0] == '.text':
-            node.addChild(self.textField())
+        if self.getCurrentToken()[0] == 'instDir':
+            node.addChild(self.instField())
         
         return node
     
     def dataField(self) -> Node:
-        if self.getCurrentToken()[0] == '.data':
+        if self.getCurrentToken()[0] == 'dataDir':
             node = Node('Data Field')
             self.advance()
 
@@ -67,21 +67,29 @@ class Parser:
     def dataList(self) -> list[Node]:
         dataList = []
 
-        if (tokenLabel := self.getCurrentToken()[0]) in self.DATA_TYPES:
-            dataList.append(self.DATA_TYPES[tokenLabel]())
+        if (tokenLabel := self.getCurrentToken()[0]) in DATA_TYPES:
+            dataList.append(self.data())
         
         elif tokenLabel == 'label':
             dataList.append(self.labelDec())
-            dataList.append(self.word())
+            dataList.append(self.data())
 
-        if (self.getCurrentToken()[0] in self.DATA_TYPES) or (self.getCurrentToken()[0] == 'label'):
+        else:
+            raise Exception('SYNTACTICAL ERROR: unexpected token. Expected data or label declaration. Got "' + tokenLabel + '"')
+
+        if (self.getCurrentToken()[0] in DATA_TYPES) or (self.getCurrentToken()[0] == 'label'):
             for data in self.dataList():
                 dataList.append(data)
 
         return dataList
     
+    def data(self) -> Node:
+        match self.getCurrentToken()[0]:
+            case 'wordDir':
+                return self.word()
+    
     def word(self) -> Node:
-        if (tokenLabel := self.getCurrentToken()[0]) == '.word':
+        if (tokenLabel := self.getCurrentToken()[0]) == 'wordDir':
             node = Node('Word')
             self.advance()
         
@@ -111,13 +119,13 @@ class Parser:
         
         return node
 
-    def textField(self) -> Node:
-        if self.getCurrentToken()[0] == '.text':
-            node = Node('Text Field')
+    def instField(self) -> Node:
+        if self.getCurrentToken()[0] == 'instDir':
+            node = Node('Inst Field')
             self.advance()
 
         else:
-            raise Exception('SYNTACTICAL ERROR: unexpected token. Expected ".text". Got "' + self.getCurrentToken()[0] + '"')
+            raise Exception('SYNTACTICAL ERROR: unexpected token. Expected ".inst". Got "' + self.getCurrentToken()[0] + '"')
 
         if (instList := self.instList()) != []:
             for inst in instList:

@@ -14,13 +14,13 @@ The grammar of the MOOn-IV assembly language is defined as follows:
 
 asmCode = [dataField], [textField] ;
 
-dataFIeld = ".data", dataList ;
+dataField = ".data", dataList ;
 dataList = (data | labelDec data), [dataList] ;
 data = word ;
 
 word = ".word", NUMBER {"," NUMBER} ;
 
-textField = ".text", instList ;
+instField = ".inst", instList ;
 instList = (inst | labelDec inst), [instList] ;
 inst = rTypeInst ;
 

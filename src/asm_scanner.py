@@ -7,7 +7,7 @@ LETTERS = 'abcdefghijklmnopqrstuvwxyz'
 SYMBOLS = ',:'
 ALPHABET = NUMBERS + LETTERS + SYMBOLS + '._&$'
 TOKEN_ENDS = IGNORED_CHARS + SYMBOLS
-DIRECTIVES = ['.data', '.word', '.text']
+DIRECTIVES = {'.data': 'dataDir', '.word': 'wordDir', '.inst': 'instDir'}
 
 
 class Scanner:
@@ -94,7 +94,7 @@ class Scanner:
                     raise Exception('LEXICAL ERROR - How did you get here? :O - Please report this issue on GitHub.')
 
         elif lexeme in DIRECTIVES:
-            return lexeme
+            return DIRECTIVES[lexeme]
         
         elif bool(re.match(r'^[0-9]+$', lexeme)): # Check if the lexeme is a number
             return 'number'
