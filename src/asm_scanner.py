@@ -5,9 +5,9 @@ IGNORED_CHARS = ' \n\t'
 NUMBERS = '0123456789'
 LETTERS = 'abcdefghijklmnopqrstuvwxyz'
 SYMBOLS = ',:'
-ALPHABET = NUMBERS + LETTERS + SYMBOLS + '._&$'
+ALPHABET = NUMBERS + LETTERS + SYMBOLS + '._&$\"'
 TOKEN_ENDS = IGNORED_CHARS + SYMBOLS
-DIRECTIVES = {'.data': 'dataDir', '.word': 'wordDir', '.inst': 'instDir'}
+DIRECTIVES = {'.data': 'dataDir', '.word': 'wordDir', '.ascii': 'asciiDir', '.inst': 'instDir'}
 
 
 class Scanner:
@@ -98,6 +98,9 @@ class Scanner:
         
         elif bool(re.match(r'^[0-9]+$', lexeme)): # Check if the lexeme is a number
             return 'number'
+        
+        elif bool(re.match(r'^\"[^"]*\"$', lexeme)): # Check if the lexeme is a string (ascii)
+            return 'string'
         
         elif bool(re.match(r'^_[a-z0-9_]+$', lexeme)): # Check if the lexeme is a label
             return 'label'

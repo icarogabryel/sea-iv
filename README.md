@@ -16,9 +16,10 @@ asmCode = [dataField], [textField] ;
 
 dataField = ".data", dataList ;
 dataList = (data | labelDec data), [dataList] ;
-data = word ;
+data = word | ascii;
 
 word = ".word", NUMBER {"," NUMBER} ;
+ascii = ".ascii", STRING ;
 
 instField = ".inst", instList ;
 instList = (inst | labelDec inst), [instList] ;
@@ -30,6 +31,7 @@ labelDec = LABEL, ':' ;
 
 (* Lexical rules (in uppercase) in regex *)
 NUMBER = ? 0|[1-9][0-9]* ? ;
+STRING = ? "[^"]*" ? ;
 MNEMONIC = ? [a-z]+ ? ;
 AC_REG = ? &(0|[1-9][0-9]*) ? ;
 RF_REG = ? $(0|[1-9][0-9]*) ? ;

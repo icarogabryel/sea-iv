@@ -15,9 +15,10 @@ class Label:
         return f'Label Dec: {self.label}'
 
 class Visitor:
-    CONST = 10
     def __init__(self, root: Node) -> None:       
         self.code = self.visit(root)
+
+        labelTable = {}
 
     def visit(self, node: Node) -> list[str|Label]:
         match node.type:
@@ -26,9 +27,13 @@ class Visitor:
             case "Data Field":
                 return self.dataField(node)
             case "Word":
-                return self.wordDir(node)
+                return self.word(node)
             case "Number":
                 return self.number(node)
+            case "ASCII":
+                return self.ascii(node)
+            case "String":
+                return self.string(node)
             case "Inst Field":
                 return self.instField(node)
             case "R Type Inst":
@@ -59,7 +64,7 @@ class Visitor:
 
         return code
     
-    def wordDir(self, node: Node) -> list[str|Label]:
+    def word(self, node: Node) -> list[str|Label]:
         code = []
 
         for child in node.children:
@@ -73,6 +78,19 @@ class Visitor:
         
         else:
             return [lexemeInBinary.zfill(16)]
+        
+    def ascii(self, node: Node) -> list[str|Label]:
+        return self.visit(node.children[0])
+    
+    def string(self, node: Node) ->list[str|Label]:
+        string = node.lexeme[1:-1]
+        code = []
+        
+        # convert every char in ascii
+        for char in string:
+            code.append(bin(ord(char))[2:].zfill(16))
+
+        return code
 
     def instField(self, node: Node) -> list[str|Label]:
         code = []

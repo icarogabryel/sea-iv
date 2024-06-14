@@ -1,4 +1,4 @@
-DATA_TYPES = ['wordDir']
+DATA_TYPES = ['wordDir', 'asciiDir']
 R_TYPE_INSTRUCTIONS = ['add', 'sub']
 INSTRUCTIONS = R_TYPE_INSTRUCTIONS
 
@@ -87,6 +87,8 @@ class Parser:
         match self.getCurrentToken()[0]:
             case 'wordDir':
                 return self.word()
+            case 'asciiDir':
+                return self.ascii()
     
     def word(self) -> Node:
         if (tokenLabel := self.getCurrentToken()[0]) == 'wordDir':
@@ -107,6 +109,28 @@ class Parser:
 
             currentToken = self.getCurrentToken()
 
+        return node
+    
+    def ascii(self) -> Node:
+        if (tokenLabel := self.getCurrentToken()[0]) == 'asciiDir':
+            node = Node('ASCII')
+            self.advance()
+        
+        else:
+            raise Exception('SYNTACTICAL ERROR: unexpected token. Expected ".ascii". Got "' + tokenLabel + '"')
+        
+        node.addChild(self.string())
+
+        return node
+    
+    def string(self) -> Node:
+        if (tokenLabel := self.getCurrentToken()[0]) == 'string':
+            node = Node('String', self.getCurrentToken()[1])
+            self.advance()
+
+        else:
+            raise Exception('SYNTACTICAL ERROR: unexpected token. Expected string. Got "' + tokenLabel + '"')
+        
         return node
     
     def number(self) -> Node:
