@@ -1,8 +1,9 @@
 .data
     .word 4, 5, 6
-    _x: .word 10
-    .byte 5, 3
-    _nome: .ascii "nome"
+    .space 3
+    _ten: .word 10
+    .byte 5
+    .ascii "nome"
 
 .inst
     add &0, $2, $3 # comment

@@ -16,8 +16,9 @@ asmCode = [dataField], [textField] ;
 
 dataField = ".data", dataList ;
 dataList = (data | labelDec data), [dataList] ;
-data = word | ascii | byte ;
+data = space | word | ascii | byte ;
 
+space = ".space", NUMBER ;
 word = ".word", NUMBER {"," NUMBER} ;
 byte = ".byte", NUMBER {"," NUMBER} ;
 ascii = ".ascii", STRING ;

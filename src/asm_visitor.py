@@ -26,6 +26,8 @@ class Visitor:
                 return self.program(node)
             case "Data Field":
                 return self.dataField(node)
+            case "Space":
+                return self.space(node)
             case "Word":
                 return self.word(node)
             case 'Byte':
@@ -46,6 +48,8 @@ class Visitor:
                 return self.rfReg(node)
             case "Label Dec":
                 return self.labelDec(node)
+            case _:
+                raise Exception('SEMANTICAL ERROR - Invalid node type.')
 
     def getMachineCode(self) -> list[str|Label]:
         return self.code
@@ -65,6 +69,11 @@ class Visitor:
             code += self.visit(child)
 
         return code
+    
+    def space(self, node: Node) -> list[str|Label]:
+        number = node.children[0].lexeme
+
+        return ['00000000'] * int(number)
     
     def word(self, node: Node) -> list[str|Label]:
         code = []

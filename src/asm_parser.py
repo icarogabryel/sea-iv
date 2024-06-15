@@ -1,4 +1,4 @@
-DATA_TYPES = ['wordDir', 'asciiDir', 'byteDir']
+DATA_TYPES = ['spaceDir', 'wordDir', 'asciiDir', 'byteDir']
 R_TYPE_INSTRUCTIONS = ['add', 'sub']
 INSTRUCTIONS = R_TYPE_INSTRUCTIONS
 
@@ -85,6 +85,8 @@ class Parser:
     
     def data(self) -> Node:
         match self.getCurrentToken()[0]:
+            case 'spaceDir':
+                return self.space()
             case 'wordDir':
                 return self.word()
             case 'byteDir':
@@ -92,6 +94,20 @@ class Parser:
                 return self.byte()
             case 'asciiDir':
                 return self.ascii()
+            case _:
+                raise Exception('SYNTACTICAL ERROR: unexpected token. Expected data directive. Got "' + self.getCurrentToken()[0] + '"')
+            
+    def space(self) -> Node:
+        if (tokenLabel := self.getCurrentToken()[0]) == 'spaceDir':
+            node = Node('Space')
+            self.advance()
+
+        else:
+            raise Exception('SYNTACTICAL ERROR: unexpected token. Expected ".space". Got "' + tokenLabel + '"')
+        
+        node.addChild(self.number())
+
+        return node
     
     def word(self) -> Node:
         if (tokenLabel := self.getCurrentToken()[0]) == 'wordDir':
