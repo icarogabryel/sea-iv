@@ -1,4 +1,4 @@
-DATA_TYPES = ['wordDir', 'asciiDir']
+DATA_TYPES = ['wordDir', 'asciiDir', 'byteDir']
 R_TYPE_INSTRUCTIONS = ['add', 'sub']
 INSTRUCTIONS = R_TYPE_INSTRUCTIONS
 
@@ -87,6 +87,9 @@ class Parser:
         match self.getCurrentToken()[0]:
             case 'wordDir':
                 return self.word()
+            case 'byteDir':
+                print("aaa2") #! remove
+                return self.byte()
             case 'asciiDir':
                 return self.ascii()
     
@@ -97,6 +100,28 @@ class Parser:
         
         else:
             raise Exception('SYNTACTICAL ERROR: unexpected token. Expected ".word". Got "' + tokenLabel + '"')
+        
+        node.addChild(self.number())
+
+        currentToken = self.getCurrentToken()
+
+        while currentToken[0] == 'comma':
+            self.advance()
+
+            node.addChild(self.number())
+
+            currentToken = self.getCurrentToken()
+
+        return node
+    
+    def byte(self) -> Node:
+        print("aaaaaaaaaaaaaaaaaaaaaaaaa") #! remove
+        if (tokenLabel := self.getCurrentToken()[0]) == 'byteDir':
+            node = Node('Byte')
+            self.advance()
+        
+        else:
+            raise Exception('SYNTACTICAL ERROR: unexpected token. Expected ".byte". Got "' + tokenLabel + '"')
         
         node.addChild(self.number())
 

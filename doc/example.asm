@@ -1,6 +1,7 @@
 .data
     .word 4, 5, 6
     _x: .word 10
+    .byte 5, 3
     _nome: .ascii "nome"
 
 .inst

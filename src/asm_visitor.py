@@ -28,6 +28,8 @@ class Visitor:
                 return self.dataField(node)
             case "Word":
                 return self.word(node)
+            case 'Byte':
+                return self.byte(node)
             case "Number":
                 return self.number(node)
             case "ASCII":
@@ -68,16 +70,34 @@ class Visitor:
         code = []
 
         for child in node.children:
-            code += self.visit(child)
+            number = self.visit(child)
+
+            if len(number) > 16:
+                raise Exception('SEMANTICAL ERROR - Word out of bounds.')
+            
+            number = number.zfill(16)
+
+            code += [number]
+
+        return code
+    
+    def byte(self, node: Node) -> list[str|Label]:
+        code = []
+
+        for child in node.children:
+            number = self.visit(child)
+
+            if len(number) > 8:
+                raise Exception('SEMANTICAL ERROR - Byte out of bounds.')
+            
+            number = number.zfill(8)
+
+            code += [number]
 
         return code
     
     def number(self, node: Node) -> str:
-        if len(lexemeInBinary := bin(int(node.lexeme))[2:]) > 16:
-            raise Exception('SEMANTICAL ERROR - Number out of bounds.')
-        
-        else:
-            return [lexemeInBinary.zfill(16)]
+            return bin(int(node.lexeme))[2:]
         
     def ascii(self, node: Node) -> list[str|Label]:
         return self.visit(node.children[0])
