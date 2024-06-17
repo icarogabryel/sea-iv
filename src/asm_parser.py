@@ -37,9 +37,9 @@ class Parser:
         self.index += 1
 
     def parse(self) -> None:
-        self.ast = self.asmCode()
+        self.ast = self.program()
 
-    def asmCode(self) -> Node:
+    def program(self) -> Node:
         node = Node('Program')
 
         while (currentToken := self.getCurrentToken()[0]) != 'EOF':

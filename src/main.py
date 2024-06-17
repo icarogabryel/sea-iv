@@ -2,22 +2,14 @@ from asm_scanner import Scanner
 from asm_parser import Parser, Node
 from asm_visitor import Visitor
 
-
 def printAST(ast: Node, tab = 0):
     print('\t' * tab + '-' + ast.type)
 
     for child in ast.children:
         printAST(child, tab + 1)
 
-def compile(input: str) -> str:
-    tokenizer = Scanner(input)
-    parser = Parser(tokenizer.getTokenStream())
-    visitor = Visitor(parser.getAst())
-
-    return visitor.getMachineCode()
-
 def main():
-    with open('./doc/example.asm', 'r') as f:
+    with open('src/example.asm', 'r') as f:
         input = f.read()
 
     tokenizer = Scanner(input)
@@ -28,19 +20,18 @@ def main():
     print('\n')
 
     parser = Parser(tokenizer.getTokenStream())
-    
-    print(parser.getAst())
+
     print('AST:\n')
     printAST(parser.getAst())
     print('\n')
 
-    # print('OBJ CODE:\n')
-    # visitor = Visitor(parser.getAst())
+    print('OBJ CODE:\n')
+    visitor = Visitor(parser.getAst())
     
-    # for line in visitor.getMachineCode():
-    #     print(line)
+    for line in visitor.getMachineCode():
+        print(line)
 
-    # print('\n')
+    print('\n')
 
 
 if __name__ == '__main__': main()

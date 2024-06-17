@@ -5,7 +5,7 @@ IGNORED_CHARS = ' \n\t'
 NUMBERS = '0123456789'
 LETTERS = 'abcdefghijklmnopqrstuvwxyz'
 SYMBOLS = ',:'
-ALPHABET = NUMBERS + LETTERS + SYMBOLS + '._&$\"'
+ALPHABET = NUMBERS + LETTERS + SYMBOLS + '._&$\"/'
 TOKEN_ENDS = IGNORED_CHARS + SYMBOLS
 DIRECTIVES = {
     '.include': 'includeDir',

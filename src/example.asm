@@ -1,4 +1,7 @@
-.include "test"
+.include "src/test.asm"
+
+.inst
+    add &0, $2, $4
 
 .data
     .word 4, 5, 6
@@ -10,3 +13,10 @@
 .inst
     add &0, $2, $3 # comment
     _loop: sub &2, $4, $5
+
+.data
+    .word 4, 5, 6
+    .space 3
+    _ten: .word 10
+    .byte 5
+    .ascii "nome"

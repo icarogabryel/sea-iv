@@ -1,5 +1,5 @@
-from typing import Any
-from asm_parser import Node, R_TYPE_INSTRUCTIONS
+from typing import Any #! remove
+from asm_parser import Node
 
 
 OPCODES = {
@@ -24,6 +24,8 @@ class Visitor:
         match node.type:
             case "Program":
                 return self.program(node)
+            case 'Include':
+                return self.include(node)
             case "Data Field":
                 return self.dataField(node)
             case "Space":
@@ -49,7 +51,7 @@ class Visitor:
             case "Label Dec":
                 return self.labelDec(node)
             case _:
-                raise Exception('SEMANTICAL ERROR - Invalid node type.')
+                raise Exception('SEMANTICAL ERROR - Invalid node type.' + node.type)
 
     def getMachineCode(self) -> list[str|Label]:
         return self.code
@@ -61,6 +63,16 @@ class Visitor:
             code += self.visit(child)
 
         return code
+    
+    def include(self, node: Node) -> list[str|Label]:
+        from compiler import compile
+
+        fileName = node.children[0].lexeme[1:-1]
+
+        with open(fileName, 'r') as f:
+            input = f.read()
+
+        return compile(input)
 
     def dataField(self, node: Node) -> list[str|Label]:
         code = []
