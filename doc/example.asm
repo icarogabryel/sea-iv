@@ -1,3 +1,5 @@
+.include "test"
+
 .data
     .word 4, 5, 6
     .space 3

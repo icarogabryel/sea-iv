@@ -9,6 +9,13 @@ def printAST(ast: Node, tab = 0):
     for child in ast.children:
         printAST(child, tab + 1)
 
+def compile(input: str) -> str:
+    tokenizer = Scanner(input)
+    parser = Parser(tokenizer.getTokenStream())
+    visitor = Visitor(parser.getAst())
+
+    return visitor.getMachineCode()
+
 def main():
     with open('./doc/example.asm', 'r') as f:
         input = f.read()
@@ -22,17 +29,18 @@ def main():
 
     parser = Parser(tokenizer.getTokenStream())
     
+    print(parser.getAst())
     print('AST:\n')
     printAST(parser.getAst())
     print('\n')
 
-    print('OBJ CODE:\n')
-    visitor = Visitor(parser.getAst())
+    # print('OBJ CODE:\n')
+    # visitor = Visitor(parser.getAst())
     
-    for line in visitor.getMachineCode():
-        print(line)
+    # for line in visitor.getMachineCode():
+    #     print(line)
 
-    print('\n')
+    # print('\n')
 
 
 if __name__ == '__main__': main()

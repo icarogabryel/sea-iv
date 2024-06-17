@@ -7,7 +7,15 @@ LETTERS = 'abcdefghijklmnopqrstuvwxyz'
 SYMBOLS = ',:'
 ALPHABET = NUMBERS + LETTERS + SYMBOLS + '._&$\"'
 TOKEN_ENDS = IGNORED_CHARS + SYMBOLS
-DIRECTIVES = {'.data': 'dataDir', '.space': 'spaceDir', '.word': 'wordDir', '.ascii': 'asciiDir', '.byte': 'byteDir', '.inst': 'instDir'}
+DIRECTIVES = {
+    '.include': 'includeDir',
+    '.data': 'dataDir',
+    '.space': 'spaceDir',
+    '.word': 'wordDir',
+    '.ascii': 'asciiDir',
+    '.byte': 'byteDir',
+    '.inst': 'instDir'
+}
 
 
 class Scanner:

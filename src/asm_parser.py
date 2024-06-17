@@ -42,11 +42,34 @@ class Parser:
     def asmCode(self) -> Node:
         node = Node('Program')
 
-        if self.getCurrentToken()[0] == 'dataDir':
-            node.addChild(self.dataField())
+        while (currentToken := self.getCurrentToken()[0]) != 'EOF':
+            if currentToken == 'dataDir':
+                node.addChild(self.dataField())
 
-        if self.getCurrentToken()[0] == 'instDir':
-            node.addChild(self.instField())
+            elif currentToken == 'instDir':
+                node.addChild(self.instField())
+            
+            elif currentToken == 'includeDir':
+                node.addChild(self.includeDir())
+            else:
+                raise Exception('SYNTACTICAL ERROR: unexpected token. Expected data, instruction or include directive. Got "' + currentToken + '"')
+            
+        return node
+    
+    def includeDir(self) -> Node:
+        if self.getCurrentToken()[0] == 'includeDir':
+            node = Node('Include')
+            self.advance()
+        
+        else:
+            raise Exception('SYNTACTICAL ERROR: unexpected token. Expected ".include". Got "' + self.getCurrentToken()[0] + '"')
+        
+        if (tokenLabel := self.getCurrentToken()[0]) == 'string':
+            node.addChild(Node('String', self.getCurrentToken()[1]))
+            self.advance()
+
+        else:
+            raise Exception('SYNTACTICAL ERROR: unexpected token. Expected string. Got "' + tokenLabel + '"')
         
         return node
     
@@ -90,7 +113,6 @@ class Parser:
             case 'wordDir':
                 return self.word()
             case 'byteDir':
-                print("aaa2") #! remove
                 return self.byte()
             case 'asciiDir':
                 return self.ascii()
@@ -131,7 +153,6 @@ class Parser:
         return node
     
     def byte(self) -> Node:
-        print("aaaaaaaaaaaaaaaaaaaaaaaaa") #! remove
         if (tokenLabel := self.getCurrentToken()[0]) == 'byteDir':
             node = Node('Byte')
             self.advance()

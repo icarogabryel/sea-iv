@@ -12,7 +12,9 @@ The grammar of the MOOn-IV assembly language is defined as follows:
 
 ```EBNF
 
-asmCode = [dataField], [textField] ;
+asmCode = {include | [dataField] | [textField] } ;
+
+include = ".include", STRING ;
 
 dataField = ".data", dataList ;
 dataList = (data | labelDec data), [dataList] ;
