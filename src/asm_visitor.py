@@ -1,11 +1,17 @@
-from typing import Any #! remove
-from asm_parser import Node
+from asm_parser import Node, NumberNode
 
 
 OPCODES = {
     'add': '000001',
     'sub': '000010',
 }
+
+class semanticError(Exception):
+    def __init__(self, message: str) -> None:
+        self.message = message
+
+    def __str__(self) -> str:
+        return f'SEMANTIC ERROR - {self.message}'
 
 
 class Label:
@@ -14,13 +20,14 @@ class Label:
     def __repr__(self) -> str:
         return f'Label Dec: {self.label}'
 
+
 class Visitor:
     def __init__(self, root: Node) -> None:       
         self.code = self.visit(root)
 
         labelTable = {}
 
-    def visit(self, node: Node) -> list[str|Label]:
+    def visit(self, node: Node):
         match node.type:
             case "Program":
                 return self.program(node)
@@ -91,14 +98,18 @@ class Visitor:
         code = []
 
         for child in node.children:
-            number = self.visit(child)
+            number = self.number(child)
+            number = bin(number)[2:]
 
             if len(number) > 16:
-                raise Exception('SEMANTICAL ERROR - Word out of bounds.')
+                raise semanticError('Number out of bounds.')
             
-            number = number.zfill(16)
+            number = number.zfill(16) # 16 bits length for a word
 
-            code += [number]
+            byte1 = number[:8]
+            byte2 = number[8:]
+
+            code += [byte1, byte2]
 
         return code
     
@@ -106,7 +117,8 @@ class Visitor:
         code = []
 
         for child in node.children:
-            number = self.visit(child)
+            number = self.number(child)
+            number = bin(number)[2:]
 
             if len(number) > 8:
                 raise Exception('SEMANTICAL ERROR - Byte out of bounds.')
@@ -117,8 +129,8 @@ class Visitor:
 
         return code
     
-    def number(self, node: Node) -> str:
-            return bin(int(node.lexeme))[2:]
+    def number(self, node: NumberNode) -> int:
+            return node.number
         
     def ascii(self, node: Node) -> list[str|Label]:
         return self.visit(node.children[0])
