@@ -1,4 +1,4 @@
-from asm_parser import Node, NumberNode
+from asm_parser import Node
 
 
 OPCODES = {
@@ -19,6 +19,15 @@ class Label:
 
     def __repr__(self) -> str:
         return f'Label Dec: {self.label}'
+
+
+class Byte:
+    def __init__(self, byte: str) -> None:
+        self.byte = byte
+        self.label = ''
+
+    def __repr__(self) -> str:
+        return f'{self.label}: {self.byte}' if len(self.label) > 0 else self.byte
 
 
 class Visitor:
@@ -129,38 +138,62 @@ class Visitor:
 
         return code
     
-    def number(self, node: NumberNode) -> int:
-            return node.number
+    def number(self, node: Node) -> int:
+            return int(node.lexeme)
         
     def ascii(self, node: Node) -> list[str|Label]:
-        return self.visit(node.children[0])
-    
-    def string(self, node: Node) ->list[str|Label]:
-        string = node.lexeme[1:-1]
+        string = self.string(node.children[0])
+
         code = []
-        
-        # convert every char in ascii
+
         for char in string:
-            code.append(bin(ord(char))[2:].zfill(16))
+            asciiChar = bin(ord(char))[2:].zfill(8)
+
+            code.append(asciiChar)
 
         return code
+
+    def string(self, node: Node) -> str:
+        return node.lexeme[1:-1]
 
     def instField(self, node: Node) -> list[str|Label]:
-        code = []
+        bytes = []
+
+        hasLabel = False
+        tempLabel = ''
 
         for child in node.children:
-            code += self.visit(child)
+            if child.type == 'Label Dec':
+                hasLabel = True
+                tempLabel = child.lexeme
+            
+            else:
+                match child.type:
+                    case 'R Type Inst':
+                        instBytes = self.rTypeInst(child)
 
-        return code
+                if hasLabel:
+                    instBytes[0].label = tempLabel
+                    hasLabel = False
+                    tempLabel = ''
+
+                bytes += instBytes
+
+        return bytes
     
-    def rTypeInst(self, node: Node) -> str:
+    def rTypeInst(self, node: Node) -> list[Byte]:
         opcode = OPCODES[node.lexeme]
 
         ac = self.visit(node.children[0])
         rf1 = self.visit(node.children[1])
         rf2 = self.visit(node.children[2])
 
-        return [opcode + ac + rf1 + rf2]
+        inst = opcode + ac + rf1 + rf2
+
+        byte1 = Byte(inst[:8])
+        byte2 = Byte(inst[8:])
+
+        return [byte1, byte2]
     
     def acReg(self, node: Node) -> str:
         addr = int(node.lexeme[1:])

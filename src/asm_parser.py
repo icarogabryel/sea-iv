@@ -14,10 +14,6 @@ class Node:
     def addChild(self, child) -> None:
         self.children.append(child)
 
-class NumberNode(Node):
-    def __init__(self, lexeme) -> None:
-        super().__init__('Number', lexeme)
-        self.number = int(lexeme)
 
 class Parser:
     def __init__(self, tokenStream: list) -> None:
@@ -201,7 +197,7 @@ class Parser:
     
     def number(self) -> Node:
         if (tokenLabel := self.getCurrentToken()[0]) == 'number':
-            node = NumberNode(self.getCurrentToken()[1])
+            node = Node('umber', self.getCurrentToken()[1])
             self.advance()
 
         else:
