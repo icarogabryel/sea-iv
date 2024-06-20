@@ -19,7 +19,7 @@ class Parser:
     def __init__(self, tokenStream: list) -> None:
         self.tokenStream = tokenStream
         self.index = 0
-
+        
         self.ast = None
 
         self.parse()

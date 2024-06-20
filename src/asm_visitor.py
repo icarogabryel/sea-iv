@@ -14,13 +14,6 @@ class semanticError(Exception):
         return f'SEMANTIC ERROR - {self.message}'
 
 
-class Label:
-    label = ''
-
-    def __repr__(self) -> str:
-        return f'Label Dec: {self.label}'
-
-
 class Byte:
     def __init__(self, byte: str) -> None:
         self.byte = byte
@@ -64,15 +57,13 @@ class Visitor:
                 return self.acReg(node)
             case "RF Reg":
                 return self.rfReg(node)
-            case "Label Dec":
-                return self.labelDec(node)
             case _:
                 raise Exception('SEMANTICAL ERROR - Invalid node type.' + node.type)
 
-    def getMachineCode(self) -> list[str|Label]:
+    def getMachineCode(self) :
         return self.code
     
-    def program(self, node: Node) -> list[str|Label]:
+    def program(self, node: Node) :
         code = []
 
         for child in node.children:
@@ -80,7 +71,7 @@ class Visitor:
 
         return code
     
-    def include(self, node: Node) -> list[str|Label]:
+    def include(self, node: Node):
         from compiler import compile
 
         fileName = node.children[0].lexeme[1:-1]
@@ -90,21 +81,52 @@ class Visitor:
 
         return compile(input)
 
-    def dataField(self, node: Node) -> list[str|Label]:
-        code = []
+    def dataField(self, node: Node):
+        codeBytes = []
+
+        hasLabel = False
+        tempLabel = ''
 
         for child in node.children:
-            code += self.visit(child)
+            if child.type == 'Label Dec':
+                hasLabel = True
+                tempLabel = child.lexeme
 
-        return code
+            else:
+                match child.type:
+                    case 'Space':
+                        dataBytes = self.space(child)
+                    case 'Word':
+                        dataBytes = self.word(child)
+                    case 'Byte':
+                        dataBytes = self.byte(child)
+                    case 'ASCII':
+                        dataBytes = self.ascii(child)
+                    case _:
+                        raise Exception('SEMANTICAL ERROR - Invalid node type.' + child.type)
+
+                if hasLabel:
+                    dataBytes[0].label = tempLabel
+                    hasLabel = False
+                    tempLabel = ''
+
+                codeBytes += dataBytes
+
+        return codeBytes
     
-    def space(self, node: Node) -> list[str|Label]:
+    def space(self, node: Node):
         number = node.children[0].lexeme
 
-        return ['00000000'] * int(number)
+        codeBytes = []
+
+        for i in range(int(number)):
+            codeByte = Byte('00000000')
+            codeBytes.append(codeByte)
+
+        return codeBytes
     
-    def word(self, node: Node) -> list[str|Label]:
-        code = []
+    def word(self, node: Node):
+        codeBytes = []
 
         for child in node.children:
             number = self.number(child)
@@ -115,14 +137,14 @@ class Visitor:
             
             number = number.zfill(16) # 16 bits length for a word
 
-            byte1 = number[:8]
-            byte2 = number[8:]
+            byte1 = Byte(number[:8])
+            byte2 = Byte(number[8:])
 
-            code += [byte1, byte2]
+            codeBytes += [byte1, byte2]
 
-        return code
+        return codeBytes
     
-    def byte(self, node: Node) -> list[str|Label]:
+    def byte(self, node: Node):
         code = []
 
         for child in node.children:
@@ -134,14 +156,14 @@ class Visitor:
             
             number = number.zfill(8)
 
-            code += [number]
+            code += [Byte(number)]
 
         return code
     
     def number(self, node: Node) -> int:
             return int(node.lexeme)
         
-    def ascii(self, node: Node) -> list[str|Label]:
+    def ascii(self, node: Node):
         string = self.string(node.children[0])
 
         code = []
@@ -149,15 +171,15 @@ class Visitor:
         for char in string:
             asciiChar = bin(ord(char))[2:].zfill(8)
 
-            code.append(asciiChar)
+            code.append(Byte(asciiChar))
 
         return code
 
     def string(self, node: Node) -> str:
         return node.lexeme[1:-1]
 
-    def instField(self, node: Node) -> list[str|Label]:
-        bytes = []
+    def instField(self, node: Node):
+        codeBytes = []
 
         hasLabel = False
         tempLabel = ''
@@ -177,11 +199,11 @@ class Visitor:
                     hasLabel = False
                     tempLabel = ''
 
-                bytes += instBytes
+                codeBytes += instBytes
 
-        return bytes
+        return codeBytes
     
-    def rTypeInst(self, node: Node) -> list[Byte]:
+    def rTypeInst(self, node: Node):
         opcode = OPCODES[node.lexeme]
 
         ac = self.visit(node.children[0])
@@ -228,8 +250,3 @@ class Visitor:
         else:
             return bin(int(addr))[2:].zfill(4)
 
-    def labelDec(self, node: Node) -> Label:
-        label = Label()
-        label.label = node.lexeme
-
-        return [label]
