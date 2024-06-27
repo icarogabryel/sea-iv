@@ -8,8 +8,8 @@ def printAST(ast: Node, tab = 0):
     for child in ast.children:
         printAST(child, tab + 1)
 
-def main():
-    with open('src/example.asm', 'r') as f:
+def main() -> None:
+    with open('example.asm', 'r') as f:
         input = f.read()
 
     tokenizer = Scanner(input)

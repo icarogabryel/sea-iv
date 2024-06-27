@@ -1,10 +1,6 @@
+from utils import INSTRUCTIONS
 from asm_parser import Node
 
-
-OPCODES = {
-    'add': '000001',
-    'sub': '000010',
-}
 
 class semanticError(Exception):
     def __init__(self, message: str) -> None:
@@ -204,49 +200,46 @@ class Visitor:
         return codeBytes
     
     def rTypeInst(self, node: Node):
-        opcode = OPCODES[node.lexeme]
+        opcode = INSTRUCTIONS[node.lexeme] # get opcode
 
+        # get registers numbers
         ac = self.visit(node.children[0])
+
+        if ac == 1:
+            raise semanticError('AC register 1 is reserved for the assembler.') # AC1 is unavailable for writing
+        
         rf1 = self.visit(node.children[1])
         rf2 = self.visit(node.children[2])
 
+        if rf1 < 0 or rf1 > 15:
+            raise semanticError('RF register out of bounds.')
+        
+        # convert to binary
+        ac = bin(ac)[2:].zfill(2)
+        rf1 = bin(rf1)[2:].zfill(4)
+        rf2 = bin(rf2)[2:].zfill(4)
+
+        # concatenate to form instruction
         inst = opcode + ac + rf1 + rf2
 
+        # split into two bytes
         byte1 = Byte(inst[:8])
         byte2 = Byte(inst[8:])
 
         return [byte1, byte2]
     
-    def acReg(self, node: Node) -> str:
-        addr = int(node.lexeme[1:])
+    def acReg(self, node: Node) -> int:
+        acNumber = int(node.lexeme[1:])
 
-        if addr == 1:
-            raise Exception('SEMANTICAL ERROR - AC register 1 is reserved for the assembler.') #! Probably error here
+        if acNumber < 0 or acNumber > 3:
+            raise semanticError('AC register out of bounds.')   
         
-        elif addr not in [0, 2, 3]:
-            raise Exception('SEMANTICAL ERROR - AC register address out of bounds.')
+        return acNumber
         
-        else:
-            return bin(int(addr))[2:].zfill(2)
-        
-    def rfReg(self, node: Node) -> str:
-        addr = int(node.lexeme[1:])
+    def rfReg(self, node: Node) -> int:
+        rfNumber = int(node.lexeme[1:])
 
-        if addr == 0:
-            raise Exception('SEMANTICAL ERROR - RF register 0 is read-only.') #! Probably error here
+        if rfNumber < 0 or rfNumber > 15:
+            raise semanticError('RF register out of bounds.')
         
-        elif addr == 1:
-            raise Exception('SEMANTICAL ERROR - RF register 0 is reserved for the assembler.')
-        
-        elif addr == 14:
-            raise Exception('SEMANTICAL ERROR - RF register 14 is the stack pointer register.')
-        
-        elif addr == 15:
-            raise Exception('SEMANTICAL ERROR - RF register 15 is the link register.')
-        
-        elif addr not in range(2, 14):
-            raise Exception('SEMANTICAL ERROR - RF register address out of bounds.')
-        
-        else:
-            return bin(int(addr))[2:].zfill(4)
-
+        return rfNumber
