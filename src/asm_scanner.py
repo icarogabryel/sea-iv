@@ -1,21 +1,5 @@
+from utils import IGNORED_CHARS, NUMBERS, LETTERS, SYMBOLS, ALPHABET, TOKEN_ENDS, DIRECTIVES
 import re
-
-
-IGNORED_CHARS = ' \n\t'
-NUMBERS = '0123456789'
-LETTERS = 'abcdefghijklmnopqrstuvwxyz'
-SYMBOLS = ',:'
-ALPHABET = NUMBERS + LETTERS + SYMBOLS + '._&$\"/'
-TOKEN_ENDS = IGNORED_CHARS + SYMBOLS
-DIRECTIVES = {
-    '.include': 'includeDir',
-    '.data': 'dataDir',
-    '.space': 'spaceDir',
-    '.word': 'wordDir',
-    '.ascii': 'asciiDir',
-    '.byte': 'byteDir',
-    '.inst': 'instDir'
-}
 
 
 class Scanner:
@@ -94,10 +78,8 @@ class Scanner:
             match lexeme:
                 case ',':
                     return 'comma'
-                
                 case ':':
                     return 'colon'
-                
                 case _:
                     raise Exception('LEXICAL ERROR - How did you get here? :O - Please report this issue on GitHub.')
 

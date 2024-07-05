@@ -1,18 +1,4 @@
-DATA_TYPES = ['spaceDir', 'wordDir', 'asciiDir', 'byteDir']
-R_TYPE_INSTRUCTIONS = ['add', 'sub']
-INSTRUCTIONS = R_TYPE_INSTRUCTIONS
-
-class Node:
-    def __init__(self, type, lexeme: str = '\0') -> None:
-        self.type = type
-        self.lexeme: str = lexeme
-        self.children: list[Node] = []
-
-    def __repr__(self) -> str:
-        return f'{self.type}({self.lexeme}) -> {self.children}'
-
-    def addChild(self, child) -> None:
-        self.children.append(child)
+from utils import INSTRUCTIONS, DATA_TYPES, Node, SyntacticError
 
 
 class Parser:
@@ -35,6 +21,13 @@ class Parser:
     
     def advance(self) -> None:
         self.index += 1
+
+    def matchLabel(self, expectedLabel) -> None:
+        if (currentTokenLabel := self.getCurrentToken()[0]) == expectedLabel:
+            self.advance()
+
+        else:
+            raise SyntacticError('Expected ' + expectedLabel + '. Got "' + currentTokenLabel + '"')
 
     def parse(self) -> None:
         self.ast = self.program()
@@ -197,7 +190,7 @@ class Parser:
     
     def number(self) -> Node:
         if (tokenLabel := self.getCurrentToken()[0]) == 'number':
-            node = Node('umber', self.getCurrentToken()[1])
+            node = Node('Number', self.getCurrentToken()[1])
             self.advance()
 
         else:
@@ -229,7 +222,7 @@ class Parser:
             instList.append(self.labelDec())
             instList.append(self.inst())
 
-        if (self.getCurrentToken()[1] == 'mnemonic') or (self.getCurrentToken()[0] == 'label'):
+        if (self.getCurrentToken()[0] == 'mnemonic') or (self.getCurrentToken()[0] == 'label'):
             for inst in self.instList():
                 instList.append(inst)
 
@@ -237,41 +230,33 @@ class Parser:
     
     def inst(self) -> Node:
         if (tokenLabel := self.getCurrentToken()[0])  == 'mnemonic':
-            if (tokenLexeme := self.getCurrentToken()[1]) in R_TYPE_INSTRUCTIONS:
-                return self.rTypeInst()
+            mnemonic = self.getCurrentToken()[1]
 
-            # todo: add more instruction types here
-            else:
-                raise Exception('SYNTACTICAL ERROR - Invalid mnemonic. Got "' + tokenLexeme + '"')
+            if (instType := INSTRUCTIONS[mnemonic][0]) == 'n':
+                return self.nTypeInst(mnemonic)
+            
+            elif instType == 'r':
+                return self.rTypeInst(mnemonic)
 
         else:
-            raise Exception('SYNTACTICAL ERROR - Expected mnemonic. Got "' + tokenLabel + '"')
+            raise SyntacticError('Expected mnemonic. Got "' + tokenLabel + '"')
 
-    def rTypeInst(self) -> Node:
-        if (tokenlexeme := self.getCurrentToken()[1]) in R_TYPE_INSTRUCTIONS:
-            node = Node('R Type Inst', tokenlexeme)
-            self.advance()
+    def nTypeInst(self, mnemonic) -> Node:
+        node = Node('N Type Inst', mnemonic)
+        self.advance()
 
-            node.addChild(self.acReg())
+        return node
 
-            if self.getCurrentToken()[0] == 'comma':
-                self.advance()
-            else:
-                raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected , after AC register. Got ' + self.getCurrentToken()[0] + '"')
-            
-            node.addChild(self.rfReg())
+    def rTypeInst(self, mnemonic) -> Node:
+        node = Node('R Type Inst', mnemonic)
+        self.advance()
+        node.addChild(self.acReg())
+        self.matchLabel('comma')
+        node.addChild(self.rfReg())
+        self.matchLabel('comma')
+        node.addChild(self.rfReg())
 
-            if self.getCurrentToken()[0] == 'comma':
-                self.advance()
-            else:
-                raise Exception('SYNTACTICAL ERROR: Unexpected token.Expected , after AC register. Got ' + self.getCurrentToken()[0] + '"')
-            
-            node.addChild(self.rfReg())
-
-            return node
-
-        else:
-            raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected R-Type instruction. Got ' + tokenlexeme + '"')
+        return node
 
     def labelDec(self) -> Node:
         if (tokenLabel := self.getCurrentToken()[0]) == 'label':

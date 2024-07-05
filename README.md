@@ -31,8 +31,6 @@ inst = rTypeInst ;
 
 nTypeInst = MNEMONIC ;
 rTypeInst = MNEMONIC, AC_REG, ",", RF_REG, ",", RG_REG ;
-iTypeInst = MNEMONIC, AC_REG, ",", NUMBER ;
-sTypeInst = MNEMONIC, AC_REG, ",", RF_REG, ",", NUMBER ;
 
 labelDec = LABEL, ':' ;
 

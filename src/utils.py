@@ -1,32 +1,62 @@
 import csv
 
 
+class Node: # AST Node
+    def __init__(self, type, lexeme: str = '\0') -> None:
+        self.type = type
+        self.lexeme: str = lexeme
+        self.children: list[Node] = []
+
+    def __repr__(self) -> str:
+        return f'{self.type}({self.lexeme}) -> {self.children}'
+
+    def addChild(self, child) -> None:
+        self.children.append(child)
+
+
+# Exceptions
+class SyntacticError(Exception):
+    def __init__(self, message: str) -> None:
+        self.message = message
+
+    def __str__(self) -> str:
+        return self.message
+
+class SemanticError(Exception):
+    def __init__(self, message: str) -> None:
+        self.message = message
+
+    def __str__(self) -> str:
+        return self.message
+
 def getInsts():
-    nTypeInsts = {}
-    rTypeInsts = {}
-    iTypeInsts = {}
-    sTypeInsts = {}
-    jTypeInsts = {}
+    instructionsDict = {}
 
     with open('../data/insts.csv', 'r') as file:
         reader = csv.reader(file)
+        next(reader)
         
-        for row in reader[1:]:
-            match row[1]:
-                case 'n':
-                    nTypeInsts.update({row[0]: row[2]})
-                case 'r':
-                    rTypeInsts.update({row[0]: row[2]})
-                case 'i':
-                    iTypeInsts.update({row[0]: row[2]})
-                case 's':
-                    sTypeInsts.update({row[0]: row[2]})
-                case 'j':
-                    jTypeInsts.update({row[0]: row[2]})
-    
-    return nTypeInsts, rTypeInsts, iTypeInsts, sTypeInsts, jTypeInsts
+        for row in reader:
+            instructionsDict.update({row[0]: (row[1], row[2])})
+
+    return instructionsDict
 
 
 # Constants
-N_TYPE_INTS, R_TYPE_INTS, I_TYPE_INTS, S_TYPE_INSTS, J_TYPE_INTS = getInsts()
-INSTRUCTIONS = {**N_TYPE_INTS, **R_TYPE_INTS, **I_TYPE_INTS, **S_TYPE_INSTS, **J_TYPE_INTS}
+INSTRUCTIONS = getInsts()
+IGNORED_CHARS = ' \n\t'
+NUMBERS = '0123456789'
+LETTERS = 'abcdefghijklmnopqrstuvwxyz'
+SYMBOLS = ',:'
+ALPHABET = NUMBERS + LETTERS + SYMBOLS + '._&$\"/'
+TOKEN_ENDS = IGNORED_CHARS + SYMBOLS
+DIRECTIVES = {
+    '.include': 'includeDir',
+    '.data': 'dataDir',
+    '.space': 'spaceDir',
+    '.word': 'wordDir',
+    '.ascii': 'asciiDir',
+    '.byte': 'byteDir',
+    '.inst': 'instDir'
+}
+DATA_TYPES = ['spaceDir', 'wordDir', 'asciiDir', 'byteDir']

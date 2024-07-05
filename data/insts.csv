@@ -1,5 +1,5 @@
 mnemonic,type,opcode
-nope,r,000000
+nope,n,000000
 add,r,000001
 sub,r,000010
 not,r,000011

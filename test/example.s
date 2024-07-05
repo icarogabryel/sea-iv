@@ -6,5 +6,6 @@
     .ascii "abc"
 
 .inst
-    add &0, $2, $3 # comment
-    _loop: sub &2, $4, $5
+    _start: add &0, $2, $3 # comment
+    nope
+    sub &2, $4, $5

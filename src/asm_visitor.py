@@ -78,7 +78,7 @@ class Visitor:
         return compile(input)
 
     def dataField(self, node: Node):
-        codeBytes = []
+        codeBytes: list[str] = []
 
         hasLabel = False
         tempLabel = ''
