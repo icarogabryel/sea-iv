@@ -20,7 +20,7 @@ class SyntacticError(Exception):
         self.message = message
 
     def __str__(self) -> str:
-        return self.message
+        return 'Syntactic Error:' + self.message
 
 class SemanticError(Exception):
     def __init__(self, message: str) -> None:

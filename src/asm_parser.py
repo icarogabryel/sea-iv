@@ -5,7 +5,6 @@ class Parser:
     def __init__(self, tokenStream: list) -> None:
         self.tokenStream = tokenStream
         self.index = 0
-        
         self.ast = None
 
         self.parse()
@@ -44,6 +43,7 @@ class Parser:
             
             elif currentToken == 'includeDir':
                 node.addChild(self.includeDir())
+
             else:
                 raise Exception('SYNTACTICAL ERROR: unexpected token. Expected data, instruction or include directive. Got "' + currentToken + '"')
             
