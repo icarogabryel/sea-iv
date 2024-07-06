@@ -1,4 +1,4 @@
-from utils import IGNORED_CHARS, NUMBERS, LETTERS, SYMBOLS, ALPHABET, TOKEN_ENDS, DIRECTIVES
+from utils import IGNORED_CHARS, SYMBOLS, ALPHABET, TOKEN_ENDS, DIRECTIVES, LexicalError
 import re
 
 
@@ -105,7 +105,7 @@ class Scanner:
             return 'rfReg'
         
         else:
-            raise Exception('LEXICAL ERROR - Invalid lexeme: ' + lexeme)
+            raise LexicalError('Invalid token: ' + lexeme)
         
     def getTokenStream(self) -> list:
         return self.tokenStream

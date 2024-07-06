@@ -9,3 +9,4 @@
     _start: add &0, $2, $3 # comment
     nope
     sub &2, $4, $5
+    addi &2, 20

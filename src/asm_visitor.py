@@ -173,6 +173,10 @@ class Visitor:
                         instBytes = self.nTypeInst(child)
                     case 'R Type Inst':
                         instBytes = self.rTypeInst(child)
+                    case 'I Type Inst':
+                        instBytes = self.iTypeInst(child)
+                    case _:
+                        raise Exception('Dude, again, how did you get here? Please report this issue on GitHub.')
 
                 if hasLabel:
                     instBytes[0].label = tempLabel
@@ -190,16 +194,13 @@ class Visitor:
         opcode = INSTRUCTIONS[node.lexeme][1] # get opcode
 
         # get registers numbers
-        ac = self.visit(node.children[0])
+        ac = self.acReg(node.children[0])
 
         if ac == 1:
             raise SemanticError('AC register 1 is reserved for the assembler.') # AC1 is unavailable for writing
         
-        rf1 = self.visit(node.children[1])
-        rf2 = self.visit(node.children[2])
-
-        if rf1 < 0 or rf1 > 15:
-            raise SemanticError('RF register out of bounds.')
+        rf1 = self.rfReg(node.children[1])
+        rf2 = self.rfReg(node.children[2])
         
         # convert to binary
         ac = bin(ac)[2:].zfill(2)
@@ -210,10 +211,24 @@ class Visitor:
         inst = opcode + ac + rf1 + rf2
 
         # split into two bytes
-        byte1 = Byte(inst[:8])
-        byte2 = Byte(inst[8:])
+        return [Byte(inst[:8]), Byte(inst[8:])]
+    
+    def iTypeInst(self, node: Node):
+        opcode = INSTRUCTIONS[node.lexeme][1]
 
-        return [byte1, byte2]
+        ac = self.acReg(node.children[0])
+
+        if ac == 1:
+            raise SemanticError('AC register 1 is reserved for the assembler.')
+        
+        number = self.visit(node.children[1])
+
+        if number < 0 or number > 255:
+            raise SemanticError('Number out of bounds. Must be between 0 and 255.')
+
+        inst = opcode + bin(ac)[2:].zfill(2) + bin(number)[2:].zfill(8)
+
+        return [Byte(inst[:8]), Byte(inst[8:])]
     
     def acReg(self, node: Node) -> int:
         acNumber = int(node.lexeme[1:])

@@ -29,7 +29,7 @@ class LexicalError(Exception):
         self.message = message
 
     def __str__(self) -> str:
-        return 'Lexical Error:' + self.message
+        return 'Lexical Error: ' + self.message
     
 
 class SyntacticError(Exception):
@@ -37,7 +37,7 @@ class SyntacticError(Exception):
         self.message = message
 
     def __str__(self) -> str:
-        return 'Syntactic Error:' + self.message
+        return 'Syntactic Error: ' + self.message
 
 
 class SemanticError(Exception):
@@ -45,7 +45,7 @@ class SemanticError(Exception):
         self.message = message
 
     def __str__(self) -> str:
-        return 'Semantic Error:' + self.message
+        return 'Semantic Error: ' + self.message
 
 
 def getInsts():

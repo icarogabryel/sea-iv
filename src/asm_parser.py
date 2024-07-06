@@ -237,6 +237,12 @@ class Parser:
             
             elif instType == 'r':
                 return self.rTypeInst(mnemonic)
+            
+            elif instType == 'i':
+                return self.iTypeInst(mnemonic)
+            
+            else:
+                raise SyntacticError('Dude, how did you get here? :O - Please report this issue on GitHub.')
 
         else:
             raise SyntacticError('Expected mnemonic. Got "' + tokenLabel + '"')
@@ -255,6 +261,15 @@ class Parser:
         node.addChild(self.rfReg())
         self.matchLabel('comma')
         node.addChild(self.rfReg())
+
+        return node
+    
+    def iTypeInst(self, mnemonic) -> Node:
+        node = Node('I Type Inst', mnemonic)
+        self.advance()
+        node.addChild(self.acReg())
+        self.matchLabel('comma')
+        node.addChild(self.number())
 
         return node
 
