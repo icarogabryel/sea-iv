@@ -1,23 +1,5 @@
-from utils import INSTRUCTIONS
+from utils import INSTRUCTIONS, SemanticError, Byte
 from asm_parser import Node
-
-
-class semanticError(Exception):
-    def __init__(self, message: str) -> None:
-        self.message = message
-
-    def __str__(self) -> str:
-        return f'SEMANTIC ERROR - {self.message}'
-
-
-class Byte:
-    def __init__(self, byte: str) -> None:
-        self.byte = byte
-        self.label = ''
-
-    def __repr__(self) -> str:
-        return f'{self.label}: {self.byte}' if len(self.label) > 0 else self.byte
-
 
 class Visitor:
     def __init__(self, root: Node) -> None:       
@@ -129,7 +111,7 @@ class Visitor:
             number = bin(number)[2:]
 
             if len(number) > 16:
-                raise semanticError('Number out of bounds.')
+                raise SemanticError('Number out of bounds.')
             
             number = number.zfill(16) # 16 bits length for a word
 
@@ -187,6 +169,8 @@ class Visitor:
             
             else:
                 match child.type:
+                    case 'N Type Inst':
+                        instBytes = self.nTypeInst(child)
                     case 'R Type Inst':
                         instBytes = self.rTypeInst(child)
 
@@ -199,20 +183,23 @@ class Visitor:
 
         return codeBytes
     
+    def nTypeInst(self, node: Node):
+        return [Byte('00000000'), Byte('00000000')]
+    
     def rTypeInst(self, node: Node):
-        opcode = INSTRUCTIONS[node.lexeme] # get opcode
+        opcode = INSTRUCTIONS[node.lexeme][1] # get opcode
 
         # get registers numbers
         ac = self.visit(node.children[0])
 
         if ac == 1:
-            raise semanticError('AC register 1 is reserved for the assembler.') # AC1 is unavailable for writing
+            raise SemanticError('AC register 1 is reserved for the assembler.') # AC1 is unavailable for writing
         
         rf1 = self.visit(node.children[1])
         rf2 = self.visit(node.children[2])
 
         if rf1 < 0 or rf1 > 15:
-            raise semanticError('RF register out of bounds.')
+            raise SemanticError('RF register out of bounds.')
         
         # convert to binary
         ac = bin(ac)[2:].zfill(2)
@@ -232,7 +219,7 @@ class Visitor:
         acNumber = int(node.lexeme[1:])
 
         if acNumber < 0 or acNumber > 3:
-            raise semanticError('AC register out of bounds.')   
+            raise SemanticError('AC register out of bounds.')   
         
         return acNumber
         
@@ -240,6 +227,6 @@ class Visitor:
         rfNumber = int(node.lexeme[1:])
 
         if rfNumber < 0 or rfNumber > 15:
-            raise semanticError('RF register out of bounds.')
+            raise SemanticError('RF register out of bounds.')
         
         return rfNumber

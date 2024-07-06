@@ -14,7 +14,24 @@ class Node: # AST Node
         self.children.append(child)
 
 
+class Byte: # Object code byte
+    def __init__(self, byte: str) -> None:
+        self.byte = byte
+        self.label = ''
+
+    def __repr__(self) -> str:
+        return f'{self.label}: {self.byte}' if len(self.label) > 0 else self.byte
+
+
 # Exceptions
+class LexicalError(Exception):
+    def __init__(self, message: str) -> None:
+        self.message = message
+
+    def __str__(self) -> str:
+        return 'Lexical Error:' + self.message
+    
+
 class SyntacticError(Exception):
     def __init__(self, message: str) -> None:
         self.message = message
@@ -22,12 +39,14 @@ class SyntacticError(Exception):
     def __str__(self) -> str:
         return 'Syntactic Error:' + self.message
 
+
 class SemanticError(Exception):
     def __init__(self, message: str) -> None:
         self.message = message
 
     def __str__(self) -> str:
-        return self.message
+        return 'Semantic Error:' + self.message
+
 
 def getInsts():
     instructionsDict = {}
