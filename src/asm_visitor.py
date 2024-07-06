@@ -175,6 +175,8 @@ class Visitor:
                         instBytes = self.rTypeInst(child)
                     case 'I Type Inst':
                         instBytes = self.iTypeInst(child)
+                    case 'S Type Inst':
+                        instBytes = self.sTypeInst(child)
                     case _:
                         raise Exception('Dude, again, how did you get here? Please report this issue on GitHub.')
 
@@ -227,6 +229,25 @@ class Visitor:
             raise SemanticError('Number out of bounds. Must be between 0 and 255.')
 
         inst = opcode + bin(ac)[2:].zfill(2) + bin(number)[2:].zfill(8)
+
+        return [Byte(inst[:8]), Byte(inst[8:])]
+    
+    def sTypeInst(self, node: Node):
+        opcode = INSTRUCTIONS[node.lexeme][1]
+
+        ac = self.acReg(node.children[0])
+
+        if ac == 1:
+            raise SemanticError('AC register 1 is reserved for the assembler.')
+        
+        rf1 = self.rfReg(node.children[1])
+        
+        number = self.visit(node.children[2])
+
+        if number < 0 or number > 15:
+            raise SemanticError('Number out of bounds. Must be between 0 and 15.')
+
+        inst = opcode + bin(ac)[2:].zfill(2) + bin(rf1)[2:].zfill(4) + bin(number)[2:].zfill(4)
 
         return [Byte(inst[:8]), Byte(inst[8:])]
     

@@ -34,8 +34,8 @@ lui,i,011111
 lsi,i,100000
 lwr,r,100001
 swr,r,100010
-push,r,100011
-pop,r,100100
+push,p,100011
+pop,p,100100
 jump,j,100101
 jal,j,100110
 jr ,r,100111
