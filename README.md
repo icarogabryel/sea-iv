@@ -58,18 +58,17 @@ Instructions are the basic building blocks of a program. An instruction is a com
 
 Pseudo-instructions are special commands that are used to simplify the writing of programs. They are not part of the MOOn IV ISA. The following pseudo-instructions are supported:
 
-- div
-- mul
-
 #### Directives
 
 Directives are special commands that are used to control the assembler, orientations to the assembling process. They are not part of the MOOn IV ISA. The following directives are supported:
 
 - .include
 - .data
-- .ascii
+- .space
 - .word
-- .text
+- .ascii
+- .byte
+- .inst
 
 #### Labels
 
@@ -77,7 +76,7 @@ Labels are used to mark locations in the program. A label is a sequence of alpha
 
 ##### Comments
 
-Comments are used to document the program. A comment starts with a semicolon and ends at the end of the line. For example, `; This is a comment.` is a comment.
+Comments are used to document the program. A comment starts with a hashtag and ends at the end of the line. For example, `# This is a comment.` is a comment.
 
 <!-- todo: complete -->
 ## Structure of the Assembler
