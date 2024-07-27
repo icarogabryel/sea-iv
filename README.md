@@ -6,6 +6,38 @@ SEA-IV - Syntax-Encoding Assembler for MOOn-IV is a simple assembler for the MOO
 
 The MOOn-IV assembly language is a low-level programming language that is used to write programs for the MOOn-IV. The MOOn IV assembly language is a human-readable representation of the machine code that is executed by the MOOn IV processor.
 
+### Language Elements
+
+The MOOn-IV assembly language has instructions, pseudo-instructions, directives, labels and comments.
+
+#### Instructions
+
+Instructions are the basic building blocks of a program. An instruction is a command that tells the processor to perform a specific operation. The MOOn-IV
+
+#### Pseudo-Instructions
+
+Pseudo-instructions are special commands that are used to simplify the writing of programs. They are not part of the MOOn IV ISA. The following pseudo-instructions are supported:
+
+#### Directives
+
+Directives are special commands that are used to control the assembler, orientations to the assembling process. They are not part of the MOOn IV ISA. The following directives are supported:
+
+- .include
+- .data
+- .space
+- .word
+- .ascii
+- .byte
+- .inst
+
+#### Labels
+
+Labels are used to mark locations in the program. A label is a sequence of alphanumeric characters that starts with underscore and ends with a colon. For example, `_loop:` is a label.
+
+#### Comments
+
+Comments are used to document the program. A comment starts with a hashtag and ends at the end of the line. For example, `# This is a comment.` is a comment.
+
 ### Grammar
 
 The grammar of the MOOn-IV assembly language is defined as follows:
@@ -46,37 +78,52 @@ LABEL = ? _[a-z0-9_]* ? ;
 
 This grammar is defined using the Extended Backus-Naur Formalism (EBNF) with some terminals witted in Extended Regular Expressions (ERE) Syntax.
 
-### Language Element
+#### Special Syntax Instructions
 
-The MOOn-IV assembly language has instructions, pseudo-instructions, directives, labels and comments.
+Some R-type instructions don't use all available fields. For example, the `not` instruction only uses the a AC register and only one RF register. The syntax for these instructions is defined as follows:
 
-#### Instructions
+| Type | Fields | Syntax |
+|-|-|-|
+| E1 | Only AC register and RF1 is pointed, RF2 is not used | `MNEMONIC, AC_REG, ",", RF_REG` |
+| E2 | Only RF2 is pointed | `MNEMONIC, RF_REG` |
+| E3 | Only AC register is pointed and RF1, RF2 is not used | `MNEMONIC, AC_REG` |
+| E4 | By convention, the left address receives the result so, in swr, ac is on the right | `MNEMONIC, RF_REG, ",", RF_REG, ",", AC_REG` |
+| E5 | Only RF1 is pointed | `MNEMONIC, RF_REG` |
 
-Instructions are the basic building blocks of a program. An instruction is a command that tells the processor to perform a specific operation. The MOOn-IV
+The list of instructions that use these special syntaxes is as follows:
 
-#### Pseudo-Instructions
+E1-type:
 
-Pseudo-instructions are special commands that are used to simplify the writing of programs. They are not part of the MOOn IV ISA. The following pseudo-instructions are supported:
+- not
+- mtac
+- mfac
+- bgtzr
+- bltzr
+- beqzr
+- bnezr
 
-#### Directives
+E2-type:
 
-Directives are special commands that are used to control the assembler, orientations to the assembling process. They are not part of the MOOn IV ISA. The following directives are supported:
+- tmul
+- tdiv
 
-- .include
-- .data
-- .space
-- .word
-- .ascii
-- .byte
-- .inst
+E3-type:
 
-#### Labels
+- mtl
+- mfl
+- mth
+- mfh
+- pop
+- push
 
-Labels are used to mark locations in the program. A label is a sequence of alphanumeric characters that starts with underscore and ends with a colon. For example, `_loop:` is a label.
+E4-type:
 
-##### Comments
+- swr
 
-Comments are used to document the program. A comment starts with a hashtag and ends at the end of the line. For example, `# This is a comment.` is a comment.
+E5-type:
+
+- jr
+- jral
 
 <!-- todo: complete -->
 ## Structure of the Assembler

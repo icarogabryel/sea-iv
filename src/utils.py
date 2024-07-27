@@ -53,7 +53,6 @@ def getInsts():
 
     with open('../data/insts.csv', 'r') as file:
         reader = csv.reader(file)
-        next(reader)
         
         for row in reader:
             instructionsDict.update({row[0]: (row[1], row[2])})
