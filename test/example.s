@@ -11,5 +11,4 @@
     sub &2, $4, $5
     addi &2, 20
     sll &2, $2, 4
-    _jump: jump 20
-    
+    _test: not &0, $5
