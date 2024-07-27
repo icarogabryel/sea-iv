@@ -177,8 +177,8 @@ class Visitor:
                         instBytes = self.iTypeInst(child)
                     case 'S Type Inst':
                         instBytes = self.sTypeInst(child)
-                    case 'P Type Inst':
-                        instBytes = self.pTypeInst(child)
+                    case 'J Type Inst':
+                        instBytes = self.jTypeInst(child)
                     case _:
                         raise Exception('Dude, again, how did you get here? Please report this issue on GitHub.')
 
@@ -253,15 +253,15 @@ class Visitor:
 
         return [Byte(inst[:8]), Byte(inst[8:])]
     
-    def pTypeInst(self, node: Node):
+    def jTypeInst(self, node: Node):
         opcode = INSTRUCTIONS[node.lexeme][1]
 
-        ac = self.acReg(node.children[0])
+        number = self.visit(node.children[0])
 
-        if node.lexeme == 'pop' and ac == 1: # Why would you push from a register that is reserved for the assembler? Idk, but feel free.
-            raise SemanticError('AC register 1 is reserved for the assembler.')
+        if number < 0 or number > 255:
+            raise SemanticError('Number out of bounds. Must be between 0 and 1023.')
 
-        inst = opcode + bin(ac)[2:].zfill(2) + '00000000'
+        inst = opcode + bin(number)[2:].zfill(10)
 
         return [Byte(inst[:8]), Byte(inst[8:])]
     

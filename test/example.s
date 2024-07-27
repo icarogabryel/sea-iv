@@ -11,4 +11,5 @@
     sub &2, $4, $5
     addi &2, 20
     sll &2, $2, 4
-    push &1
+    _jump: jump 20
+    

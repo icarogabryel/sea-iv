@@ -244,6 +244,9 @@ class Parser:
             elif instType == 's':
                 return self.sTypeInst(mnemonic)
             
+            elif instType == 'j':
+                return self.jTypeInst(mnemonic)
+            
             else:
                 raise SyntacticError('Dude, how did you get here? :O - Please report this issue on GitHub.')
 
@@ -283,6 +286,13 @@ class Parser:
         self.matchLabel('comma')
         node.addChild(self.rfReg())
         self.matchLabel('comma')
+        node.addChild(self.number())
+
+        return node
+    
+    def jTypeInst(self, mnemonic) -> Node:
+        node = Node('J Type Inst', mnemonic)
+        self.advance()
         node.addChild(self.number())
 
         return node
