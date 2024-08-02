@@ -250,6 +250,9 @@ class Parser:
             elif instType == 'e1':
                 return self.e1TypeInst(mnemonic)
             
+            elif instType == 'e2':
+                return self.e2TypeInst(mnemonic)
+            
             else:
                 raise SyntacticError('Dude, how did you get here? :O - Please report this issue on GitHub.')
 
@@ -305,6 +308,13 @@ class Parser:
         self.advance()
         node.addChild(self.acReg())
         self.matchLabel('comma')
+        node.addChild(self.rfReg())
+
+        return node
+    
+    def e2TypeInst(self, mnemonic) -> Node:
+        node = Node('E2 Type Inst', mnemonic)
+        self.advance()
         node.addChild(self.rfReg())
 
         return node

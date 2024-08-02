@@ -11,4 +11,4 @@
     sub &2, $4, $5
     addi &2, 20
     sll &2, $2, 4
-    _test: not &0, $5
+    _test: tmul $3

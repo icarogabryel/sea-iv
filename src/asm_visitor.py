@@ -181,6 +181,8 @@ class Visitor:
                         instBytes = self.jTypeInst(child)
                     case 'E1 Type Inst':
                         instBytes = self.e1TypeInst(child)
+                    case 'E2 Type Inst':
+                        instBytes = self.e2TypeInst(child)
                     case _:
                         raise Exception('Dude, again, how did you get here? Please report this issue on GitHub.')
 
@@ -282,11 +284,20 @@ class Visitor:
 
         return [Byte(inst[:8]), Byte(inst[8:])]
     
+    def e2TypeInst(self, node: Node):
+        opcode = INSTRUCTIONS[node.lexeme][1]
+
+        rf2 = self.rfReg(node.children[0])
+
+        inst = opcode + '0000' + bin(rf2)[2:].zfill(4) + '0000'
+
+        return [Byte(inst[:8]), Byte(inst[8:])]
+
     def acReg(self, node: Node) -> int:
         acNumber = int(node.lexeme[1:])
 
         if acNumber < 0 or acNumber > 3:
-            raise SemanticError('AC register out of bounds.')   
+            raise SemanticError('AC register out of bounds.')
         
         return acNumber
         
