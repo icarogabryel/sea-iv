@@ -171,18 +171,28 @@ class Visitor:
                 match child.type:
                     case 'N Type Inst':
                         instBytes = self.nTypeInst(child)
+
                     case 'R Type Inst':
                         instBytes = self.rTypeInst(child)
+
                     case 'I Type Inst':
                         instBytes = self.iTypeInst(child)
+
                     case 'S Type Inst':
                         instBytes = self.sTypeInst(child)
+
                     case 'J Type Inst':
                         instBytes = self.jTypeInst(child)
+
                     case 'E1 Type Inst':
                         instBytes = self.e1TypeInst(child)
+
                     case 'E2 Type Inst':
                         instBytes = self.e2TypeInst(child)
+
+                    case 'E3 Type Inst':
+                        instBytes = self.e3TypeInst(child)
+
                     case _:
                         raise Exception('Dude, again, how did you get here? Please report this issue on GitHub.')
 
@@ -290,6 +300,18 @@ class Visitor:
         rf2 = self.rfReg(node.children[0])
 
         inst = opcode + '0000' + bin(rf2)[2:].zfill(4) + '0000'
+
+        return [Byte(inst[:8]), Byte(inst[8:])]
+    
+    def e3TypeInst(self, node: Node):
+        opcode = INSTRUCTIONS[node.lexeme][1]
+
+        ac = self.acReg(node.children[0])
+
+        if ac == 1:
+            raise SemanticError('AC register 1 is reserved for the assembler.')
+        
+        inst = opcode + bin(ac)[2:].zfill(2) + '0000' + '0000'
 
         return [Byte(inst[:8]), Byte(inst[8:])]
 
