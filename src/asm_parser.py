@@ -255,6 +255,9 @@ class Parser:
             
             elif instType == 'e3':
                 return self.e3TypeInst(mnemonic)
+
+            elif instType == 'e4':
+                return self.e4TypeInst(mnemonic)
             
             else:
                 raise SyntacticError('Dude, how did you get here? :O - Please report this issue on GitHub.')
@@ -326,6 +329,13 @@ class Parser:
         node = Node('E3 Type Inst', mnemonic)
         self.advance()
         node.addChild(self.acReg())
+
+        return node
+    
+    def e4TypeInst(self, mnemonic) -> Node:
+        node = Node('E4 Type Inst', mnemonic)
+        self.advance()
+        node.addChild(self.rfReg())
 
         return node
 

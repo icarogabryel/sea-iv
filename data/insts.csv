@@ -32,13 +32,13 @@ lli,i,011110
 lui,i,011111
 lsi,i,100000
 lwr,r,100001
-swr,e4,100010
+swr,r,100010
 push,e3,100011
 pop,e3,100100
 jump,j,100101
 jal,j,100110
-jr ,e5,100111
-jral,e5,101000
+jr,e4,100111
+jral,e4,101000
 bgtz,i,101001
 bltz,i,101010
 beqz,i,101011

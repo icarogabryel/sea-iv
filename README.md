@@ -87,8 +87,7 @@ Some R-type instructions don't use all available fields. For example, the `not` 
 | E1 | Only AC register and RF1 is pointed, RF2 is not used | `MNEMONIC, AC_REG, ",", RF_REG` |
 | E2 | Only RF2 is pointed | `MNEMONIC, RF_REG` |
 | E3 | Only AC register is pointed and RF1, RF2 is not used | `MNEMONIC, AC_REG` |
-| E4 | By convention, the left address receives the result so, in swr, ac is on the right | `MNEMONIC, RF_REG, ",", RF_REG, ",", AC_REG` |
-| E5 | Only RF1 is pointed | `MNEMONIC, RF_REG` |
+| E4 | Only RF1 is pointed | `MNEMONIC, RF_REG` |
 
 The list of instructions that use these special syntaxes is as follows:
 
@@ -117,10 +116,6 @@ E3-type:
 - push
 
 E4-type:
-
-- swr
-
-E5-type:
 
 - jr
 - jral
