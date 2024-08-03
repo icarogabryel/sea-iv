@@ -80,6 +80,10 @@ class Scanner:
                     return 'comma'
                 case ':':
                     return 'colon'
+                case '(':
+                    return 'lParen'
+                case ')':
+                    return 'rParen'
                 case _:
                     raise Exception('LEXICAL ERROR - How did you get here? :O - Please report this issue on GitHub.')
 

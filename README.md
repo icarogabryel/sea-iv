@@ -88,6 +88,7 @@ Some R-type instructions don't use all available fields. For example, the `not` 
 | E2 | Only RF2 is pointed | `MNEMONIC, RF_REG` |
 | E3 | Only AC register is pointed and RF1, RF2 is not used | `MNEMONIC, AC_REG` |
 | E4 | Only RF1 is pointed | `MNEMONIC, RF_REG` |
+| E5 | Array-like syntax for pop | `MNEMONIC, AC_REG, ",", RF_REG, "(", RF_REG, ")"` |
 
 The list of instructions that use these special syntaxes is as follows:
 
@@ -119,6 +120,11 @@ E4-type:
 
 - jr
 - jral
+
+E5-type:
+
+- swr
+- lwr
 
 <!-- todo: complete -->
 ## Structure of the Assembler

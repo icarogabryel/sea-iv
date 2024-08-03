@@ -31,8 +31,8 @@ xnori,i,011101
 lli,i,011110
 lui,i,011111
 lsi,i,100000
-lwr,r,100001
-swr,r,100010
+lwr,e5,100001
+swr,e5,100010
 push,e3,100011
 pop,e3,100100
 jump,j,100101
