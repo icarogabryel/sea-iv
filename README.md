@@ -63,6 +63,16 @@ inst = rTypeInst ;
 
 nTypeInst = MNEMONIC ;
 rTypeInst = MNEMONIC, AC_REG, ",", RF_REG, ",", RG_REG ;
+iTypeInst = MNEMONIC, AC_REG, ",", NUMBER ;
+sTypeInst = MNEMONIC, AC_REG, ",", RF_REG, ",", NUMBER ;
+jTypeInst = MNEMONIC, (NUMBER | LABEL) ;
+
+e1TypeInst = MNEMONIC, AC_REG, ",", RF_REG ;
+e2TypeInst = MNEMONIC, RF_REG ;
+e3TypeInst = MNEMONIC, AC_REG ;
+e4TypeInst = MNEMONIC, RF_REG ;
+e5TypeInst = MNEMONIC, AC_REG, ",", RF_REG, "(", RF_REG, ")" ;
+
 
 labelDec = LABEL, ':' ;
 
