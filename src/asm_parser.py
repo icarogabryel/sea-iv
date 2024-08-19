@@ -259,8 +259,8 @@ class Parser:
             elif instType == 'e4':
                 return self.e4TypeInst(mnemonic)
             
-            elif instType == 'e5':
-                return self.e5TypeInst(mnemonic)
+            # elif instType == 'e5': # todo: this will be implemented as a pseudo instruction
+            #     return self.e5TypeInst(mnemonic)
             
             else:
                 raise SyntacticError('Dude, how did you get here? :O - Please report this issue on GitHub.')
@@ -342,17 +342,17 @@ class Parser:
 
         return node
     
-    def e5TypeInst(self, mnemonic) -> Node:
-        node = Node('E5 Type Inst', mnemonic)
-        self.advance()
-        node.addChild(self.acReg())
-        self.matchLabel('comma')
-        node.addChild(self.rfReg())
-        self.matchLabel('lParen')
-        node.addChild(self.rfReg())
-        self.matchLabel('rParen')
+    # def e5TypeInst(self, mnemonic) -> Node: # todo: this will be implemented as a pseudo instruction
+    #     node = Node('E5 Type Inst', mnemonic)
+    #     self.advance()
+    #     node.addChild(self.acReg())
+    #     self.matchLabel('comma')
+    #     node.addChild(self.rfReg())
+    #     self.matchLabel('lParen')
+    #     node.addChild(self.rfReg())
+    #     self.matchLabel('rParen')
 
-        return node
+    #     return node
 
     def labelDec(self) -> Node:
         if (tokenLabel := self.getCurrentToken()[0]) == 'label':

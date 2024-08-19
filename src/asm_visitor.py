@@ -196,8 +196,8 @@ class Visitor:
                     case 'E4 Type Inst':
                         instBytes = self.e4TypeInst(child)
 
-                    case 'E5 Type Inst':
-                        instBytes = self.e5TypeInst(child)
+                    # case 'E5 Type Inst': # todo: this will be a pseudo instruction
+                    #     instBytes = self.e5TypeInst(child)
 
                     case _:
                         raise Exception('Dude, again, how did you get here? Please report this issue on GitHub.')
@@ -328,18 +328,18 @@ class Visitor:
 
         return [Byte(inst[:8]), Byte(inst[8:])]
     
-    def e5TypeInst(self, node: Node):
-        opcode = INSTRUCTIONS[node.lexeme][1]
-        ac = self.acReg(node.children[0])
+    # def e5TypeInst(self, node: Node): # todo: this will be a pseudo instruction
+    #     opcode = INSTRUCTIONS[node.lexeme][1]
+    #     ac = self.acReg(node.children[0])
 
-        if ac == 1:
-            raise SemanticError('AC register 1 is reserved for the assembler.')
+    #     if ac == 1:
+    #         raise SemanticError('AC register 1 is reserved for the assembler.')
         
-        rf1 = self.rfReg(node.children[1])
-        rf2 = self.rfReg(node.children[2])
-        inst = opcode + bin(ac)[2:].zfill(2) + bin(rf1)[2:].zfill(4) + bin(rf2)[2:].zfill(4)
+    #     rf1 = self.rfReg(node.children[1])
+    #     rf2 = self.rfReg(node.children[2])
+    #     inst = opcode + bin(ac)[2:].zfill(2) + bin(rf1)[2:].zfill(4) + bin(rf2)[2:].zfill(4)
 
-        return [Byte(inst[:8]), Byte(inst[8:])]
+    #     return [Byte(inst[:8]), Byte(inst[8:])]
 
     def acReg(self, node: Node) -> int:
         acNumber = int(node.lexeme[1:])

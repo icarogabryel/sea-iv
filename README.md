@@ -65,14 +65,12 @@ nTypeInst = MNEMONIC ;
 rTypeInst = MNEMONIC, AC_REG, ",", RF_REG, ",", RG_REG ;
 iTypeInst = MNEMONIC, AC_REG, ",", NUMBER ;
 sTypeInst = MNEMONIC, AC_REG, ",", RF_REG, ",", NUMBER ;
-jTypeInst = MNEMONIC, (NUMBER | LABEL) ;
+jTypeInst = MNEMONIC, NUMBER ;
 
 e1TypeInst = MNEMONIC, AC_REG, ",", RF_REG ;
 e2TypeInst = MNEMONIC, RF_REG ;
 e3TypeInst = MNEMONIC, AC_REG ;
 e4TypeInst = MNEMONIC, RF_REG ;
-e5TypeInst = MNEMONIC, AC_REG, ",", RF_REG, "(", RF_REG, ")" ;
-
 
 labelDec = LABEL, ':' ;
 
@@ -98,7 +96,6 @@ Some R-type instructions don't use all available fields. For example, the `not` 
 | E2 | Only RF2 is pointed | `MNEMONIC, RF_REG` |
 | E3 | Only AC register is pointed and RF1, RF2 is not used | `MNEMONIC, AC_REG` |
 | E4 | Only RF1 is pointed | `MNEMONIC, RF_REG` |
-| E5 | Array-like syntax for load/store word | `MNEMONIC, AC_REG, ",", RF_REG, "(", RF_REG, ")"` |
 
 The list of instructions that use these special syntaxes is as follows:
 
@@ -130,11 +127,6 @@ E4-type:
 
 - jr
 - jral
-
-E5-type:
-
-- swr
-- lwr
 
 <!-- todo: complete -->
 ## Structure of the Assembler
