@@ -1,6 +1,6 @@
 # SEA-IV
 
-SEA-IV - Syntax-Encoding Assembler for MOOn-IV is a simple assembler for the MOOn-IV architecture. It is written in Python 3 and is a command-line tool.
+SEA-IV - Syntax-Encoding Assembler for MOOn-IV is a simple assembler for the MOOn-IV architecture. In this repository, you will find the source code for the assembler and the documentation for the MOOn-IV assembly language in this very README file.
 
 ## MOOn-IV Assembly Language
 
@@ -129,8 +129,17 @@ E4-type:
 - jral
 
 <!-- todo: complete -->
-## Structure of the Assembler
+<!--  ## Structure of the Assembler -->
 
 ## Installation
 
-## Usage
+First, clone the repository. Second, install Python 3 Interpreter. After that, you can run the assembler using the following command in the `src` directory:
+
+```bash
+python3 main.py
+```
+
+You will need to change the `main.py` file to put the directory of the file you want to assemble. This is a temporary solution and will be fixed in the future.
+
+<!-- todo: complete -->
+<!-- ## Usage -->
