@@ -18,6 +18,8 @@ Instructions are the basic building blocks of a program. An instruction is a com
 
 Pseudo-instructions are special commands that are used to simplify the writing of programs. They are not part of the MOOn IV ISA. The following pseudo-instructions are supported:
 
+- jump
+
 #### Directives
 
 Directives are special commands that are used to control the assembler, orientations to the assembling process. They are not part of the MOOn IV ISA. The following directives are supported:
@@ -59,7 +61,7 @@ ascii = ".ascii", STRING ;
 
 instField = ".inst", instList ;
 instList = (inst | labelDec inst), [instList] ;
-inst = rTypeInst ;
+inst = rTypeInst | iTypeInst | sTypeInst | jTypeInst | e1TypeInst | e2TypeInst | e3TypeInst | e4TypeInst | pseudoInst;
 
 nTypeInst = MNEMONIC ;
 rTypeInst = MNEMONIC, AC_REG, ",", RF_REG, ",", RG_REG ;
@@ -71,6 +73,9 @@ e1TypeInst = MNEMONIC, AC_REG, ",", RF_REG ;
 e2TypeInst = MNEMONIC, RF_REG ;
 e3TypeInst = MNEMONIC, AC_REG ;
 e4TypeInst = MNEMONIC, RF_REG ;
+
+pseudoInst = jump ;
+jump = "jump", (LABEL | NUMBER) ;
 
 labelDec = LABEL, ':' ;
 

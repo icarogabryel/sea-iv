@@ -1,4 +1,4 @@
-from utils import INSTRUCTIONS, DATA_TYPES, Node, SyntacticError
+from utils import INSTRUCTIONS, PSEUDO_INSTRUCTIONS, DATA_TYPES, Node, SyntacticError
 
 
 class Parser:
@@ -215,10 +215,15 @@ class Parser:
     def instList(self) -> list[Node]:
         instList = []
 
-        if self.getCurrentToken()[0] == 'mnemonic':
-            instList.append(self.inst())
+        tokenLabel, tokenLexeme = self.getCurrentToken()
+
+        if tokenLabel == 'mnemonic':
+            if tokenLexeme in PSEUDO_INSTRUCTIONS:
+                instList.append(self.pseudoInst())
+            else:
+                instList.append(self.inst())
         
-        elif self.getCurrentToken()[0] == 'label':
+        elif tokenLabel == 'label':
             instList.append(self.labelDec())
             instList.append(self.inst())
 
@@ -229,44 +234,37 @@ class Parser:
         return instList
     
     def inst(self) -> Node:
-        if (tokenLabel := self.getCurrentToken()[0])  == 'mnemonic':
-            mnemonic = self.getCurrentToken()[1]
+        tokenLabel, tokenLexeme = self.getCurrentToken()
 
-            if (instType := INSTRUCTIONS[mnemonic][0]) == 'n':
-                return self.nTypeInst(mnemonic)
-            
-            elif instType == 'r':
-                return self.rTypeInst(mnemonic)
-            
-            elif instType == 'i':
-                return self.iTypeInst(mnemonic)
-            
-            elif instType == 's':
-                return self.sTypeInst(mnemonic)
-            
-            elif instType == 'j':
-                return self.jTypeInst(mnemonic)
-            
-            elif instType == 'e1':
-                return self.e1TypeInst(mnemonic)
-            
-            elif instType == 'e2':
-                return self.e2TypeInst(mnemonic)
-            
-            elif instType == 'e3':
-                return self.e3TypeInst(mnemonic)
-
-            elif instType == 'e4':
-                return self.e4TypeInst(mnemonic)
-            
-            # elif instType == 'e5': # todo: this will be implemented as a pseudo instruction
-            #     return self.e5TypeInst(mnemonic)
-            
-            else:
-                raise SyntacticError('Dude, how did you get here? :O - Please report this issue on GitHub.')
-
-        else:
+        if tokenLabel != 'mnemonic':
             raise SyntacticError('Expected mnemonic. Got "' + tokenLabel + '"')
+
+        if tokenLexeme not in INSTRUCTIONS:
+            raise SyntacticError('Invalid mnemonic: ' + tokenLexeme)
+        
+        instType = INSTRUCTIONS[tokenLexeme][0]
+        
+        match instType:
+            case 'n':
+                return self.nTypeInst(tokenLexeme)
+            case'r':
+                return self.rTypeInst(tokenLexeme)
+            case 'i':
+                return self.iTypeInst(tokenLexeme)
+            case 's':
+                return self.sTypeInst(tokenLexeme)
+            case 'j':
+                return self.jTypeInst(tokenLexeme)
+            case 'e1':
+                return self.e1TypeInst(tokenLexeme)
+            case 'e2':
+                return self.e2TypeInst(tokenLexeme)
+            case 'e3':
+                return self.e3TypeInst(tokenLexeme)
+            case 'e4':
+                return self.e4TypeInst(tokenLexeme)
+            case _:
+                raise SyntacticError('Dude, how did you get here? :O - Please report this issue on GitHub.')
 
     def nTypeInst(self, mnemonic) -> Node:
         node = Node('N Type Inst', mnemonic)
@@ -342,6 +340,26 @@ class Parser:
 
         return node
     
+    def pseudoInst(self) -> Node:
+        match (tokenLexeme := self.getCurrentToken()[1]):
+            case 'jump':
+                return self.jump(tokenLexeme)
+            case _:
+                raise SyntacticError('How did you get here? :O - Please report this issue on GitHub.')
+            
+    def jump(self, lexeme) -> Node:
+        node = Node('Pseudo Jump', lexeme)
+        self.advance()
+
+        if self.getCurrentToken()[0] == 'number':
+            node.addChild(self.number())
+        elif self.getCurrentToken()[0] == 'label':
+            node.addChild(self.label())
+        else:
+            raise SyntacticError('Expected number or label. Got "' + self.getCurrentToken()[0] + '"')
+
+        return node
+    
     # def e5TypeInst(self, mnemonic) -> Node: # todo: this will be implemented as a pseudo instruction
     #     node = Node('E5 Type Inst', mnemonic)
     #     self.advance()
@@ -367,6 +385,16 @@ class Parser:
        
         else:
             raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected label declaration. Got "' + tokenLabel + '"')
+        
+        return node
+    
+    def label(self) -> Node:
+        if (tokenLabel := self.getCurrentToken()[0]) == 'label':
+            node = Node('Label', self.getCurrentToken()[1])
+            self.advance()
+        
+        else:
+            raise Exception('SYNTACTICAL ERROR: Unexpected token. Expected label. Got "' + tokenLabel + '"')
         
         return node
         

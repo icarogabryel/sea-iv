@@ -11,4 +11,4 @@
     sub &2, $4, $5
     addi &2, 20
     sll &2, $2, 4
-    _test: swr &2, $6, $7
+    jump _top

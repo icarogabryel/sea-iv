@@ -59,9 +59,18 @@ def getInsts():
 
     return instructionsDict
 
+def getPseudoInsts():
+    pseudoInstructionsList = []
+
+    with open('../data/pseudo_insts.txt', 'r') as file:
+        pseudoInstructionsList = file.read().splitlines()
+
+    return pseudoInstructionsList
+
 
 # Constants
 INSTRUCTIONS = getInsts()
+PSEUDO_INSTRUCTIONS = getPseudoInsts()
 IGNORED_CHARS = ' \n\t'
 NUMBERS = '0123456789'
 LETTERS = 'abcdefghijklmnopqrstuvwxyz'

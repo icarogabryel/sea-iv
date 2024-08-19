@@ -25,7 +25,7 @@ def main() -> None:
     printAST(parser.getAst())
     print('\n')
 
-    showMachineCode = True
+    showMachineCode = False
 
     if showMachineCode:
         print('OBJ CODE:\n')
