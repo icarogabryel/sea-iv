@@ -1,6 +1,7 @@
 from asm_scanner import Scanner
 from asm_parser import Parser, Node
 from asm_visitor import Visitor
+from asm_linker import Linker
 
 def printAST(ast: Node, tab = 0):
     print('\t' * tab + '-' + ast.type)
@@ -13,7 +14,7 @@ def main() -> None:
         input = f.read()
 
     tokenizer = Scanner(input)
-    
+
     print('\nTOKEN STREAM:\n')
     for token in tokenizer.getTokenStream():
         print(token)
@@ -25,7 +26,7 @@ def main() -> None:
     printAST(parser.getAst())
     print('\n')
 
-    showMachineCode = False
+    showMachineCode = True
 
     if showMachineCode:
         print('OBJ CODE:\n')
@@ -35,6 +36,11 @@ def main() -> None:
             print(line)
 
         print('\n')
+
+        linker = Linker(visitor.getMachineCode())
+
+        for label in linker.getLabelTable():
+            print(label, linker.getLabelTable()[label])
 
 
 if __name__ == '__main__': main()

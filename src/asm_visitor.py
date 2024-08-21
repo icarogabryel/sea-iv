@@ -5,8 +5,6 @@ class Visitor:
     def __init__(self, root: Node) -> None:       
         self.code = self.visit(root)
 
-        labelTable = {}
-
     def visit(self, node: Node):
         match node.type:
             case "Program":
@@ -171,30 +169,24 @@ class Visitor:
                 match child.type:
                     case 'N Type Inst':
                         instBytes = self.nTypeInst(child)
-
                     case 'R Type Inst':
                         instBytes = self.rTypeInst(child)
-
                     case 'I Type Inst':
                         instBytes = self.iTypeInst(child)
-
                     case 'S Type Inst':
                         instBytes = self.sTypeInst(child)
-
                     case 'J Type Inst':
                         instBytes = self.jTypeInst(child)
-
                     case 'E1 Type Inst':
                         instBytes = self.e1TypeInst(child)
-
                     case 'E2 Type Inst':
                         instBytes = self.e2TypeInst(child)
-
                     case 'E3 Type Inst':
                         instBytes = self.e3TypeInst(child)
-
                     case 'E4 Type Inst':
                         instBytes = self.e4TypeInst(child)
+                    case 'Pseudo Jump':
+                        instBytes = self.pseudoJump(child)
 
                     # case 'E5 Type Inst': # todo: this will be a pseudo instruction
                     #     instBytes = self.e5TypeInst(child)
@@ -327,6 +319,49 @@ class Visitor:
         inst = opcode + '00' + bin(rf1)[2:].zfill(4) + '0000'
 
         return [Byte(inst[:8]), Byte(inst[8:])]
+    
+    def pseudoJump(self, node: Node):
+        child = node.children[0]
+
+        if child.type == 'Number':
+            number = self.number(child)
+            numberInBinary = bin(number)[2:]
+
+            if len(numberInBinary) > 16:
+                raise SemanticError('Number out of bounds. Must be between 0 and 1023.')
+            
+            number = numberInBinary.zfill(16)
+
+            result1 = number[:8]
+            result2 = number[8:]
+        
+        elif child.type == 'Label':
+            label = self.label(child)
+
+            result1 = r'{' + f'la;{label};15-8' + r'}'
+            result2 = r'{' + f'la;{label};7-0' + r'}'
+
+        else:
+            raise SemanticError('Internal error. Please report this issue on GitHub.')
+
+        word1 = '011111' + '01' + result1 # lui ac1, {bigger 8 bits of the number}
+        word2 = '011001' + '01' + result2 # ori ac1, {smaller 8 bits of the number}
+        word3 = '010100' + '01' + '0001' + '0000' # mfac ac1, rf1
+        word4 = '100111' + '00' + '0001' + '0000' # ja rf1
+
+        byte1 = Byte(word1[:8])
+        byte2 = Byte(word1[8:])
+        byte3 = Byte(word2[:8])
+        byte4 = Byte(word2[8:])
+        byte5 = Byte(word3[:8])
+        byte6 = Byte(word3[8:])
+        byte7 = Byte(word4[:8])
+        byte8 = Byte(word4[8:])
+
+        return [byte1, byte2, byte3, byte4, byte5, byte6, byte7, byte8]
+
+    def label(self, node: Node) -> str:
+        return node.lexeme
     
     # def e5TypeInst(self, node: Node): # todo: this will be a pseudo instruction
     #     opcode = INSTRUCTIONS[node.lexeme][1]

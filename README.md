@@ -19,6 +19,11 @@ Instructions are the basic building blocks of a program. An instruction is a com
 Pseudo-instructions are special commands that are used to simplify the writing of programs. They are not part of the MOOn IV ISA. The following pseudo-instructions are supported:
 
 - jump
+- lw
+- sw
+- mul
+- div
+- swap
 
 #### Directives
 
