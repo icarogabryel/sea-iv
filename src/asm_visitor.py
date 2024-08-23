@@ -338,8 +338,8 @@ class Visitor:
         elif child.type == 'Label':
             label = self.label(child)
 
-            result1 = r'{' + f'la;{label};15-8' + r'}'
-            result2 = r'{' + f'la;{label};7-0' + r'}'
+            result1 = r'{' + f'{label};15-8' + r'}'
+            result2 = r'{' + f'{label};7-0' + r'}'
 
         else:
             raise SemanticError('Internal error. Please report this issue on GitHub.')

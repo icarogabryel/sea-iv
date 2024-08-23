@@ -39,8 +39,10 @@ def main() -> None:
 
         linker = Linker(visitor.getMachineCode())
 
-        for label in linker.getLabelTable():
-            print(label, linker.getLabelTable()[label])
+        print('LINKED OBJ CODE:\n')
+
+        for line in linker.rawBytesList:
+            print(line)
 
 
 if __name__ == '__main__': main()
