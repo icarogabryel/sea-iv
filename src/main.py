@@ -39,7 +39,7 @@ def main() -> None:
 
         linker = Linker(visitor.getMachineCode())
 
-        print('LINKED OBJ CODE:\n')
+        print('MACHINE CODE:\n')
 
         for line in linker.rawBytesList:
             print(line)

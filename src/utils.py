@@ -64,6 +64,7 @@ def getPseudoInsts():
 
     with open('../data/pseudo_insts.txt', 'r') as file:
         pseudoInstructionsList = file.read().splitlines()
+        print(pseudoInstructionsList)
 
     return pseudoInstructionsList
 

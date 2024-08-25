@@ -218,10 +218,7 @@ class Parser:
         tokenLabel, tokenLexeme = self.getCurrentToken()
 
         if tokenLabel == 'mnemonic':
-            if tokenLexeme in PSEUDO_INSTRUCTIONS:
-                instList.append(self.pseudoInst())
-            else:
-                instList.append(self.inst())
+            instList.append(self.inst())
         
         elif tokenLabel == 'label':
             instList.append(self.labelDec())
@@ -238,6 +235,9 @@ class Parser:
 
         if tokenLabel != 'mnemonic':
             raise SyntacticError('Expected mnemonic. Got "' + tokenLabel + '"')
+        
+        if tokenLexeme in PSEUDO_INSTRUCTIONS:
+            return self.pseudoInst()
 
         if tokenLexeme not in INSTRUCTIONS:
             raise SyntacticError('Invalid mnemonic: ' + tokenLexeme)
@@ -344,6 +344,8 @@ class Parser:
         match (tokenLexeme := self.getCurrentToken()[1]):
             case 'jump':
                 return self.jump(tokenLexeme)
+            case 'mul':
+                return self.mul(tokenLexeme)
             case _:
                 raise SyntacticError('How did you get here? :O - Please report this issue on GitHub.')
             
@@ -357,6 +359,15 @@ class Parser:
             node.addChild(self.label())
         else:
             raise SyntacticError('Expected number or label. Got "' + self.getCurrentToken()[0] + '"')
+
+        return node
+    
+    def mul(self, lexeme) -> Node:
+        node = Node('Pseudo Mul', lexeme)
+        self.advance()
+        node.addChild(self.rfReg())
+        self.matchLabel('comma')
+        node.addChild(self.rfReg())
 
         return node
     

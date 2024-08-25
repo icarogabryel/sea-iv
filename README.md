@@ -79,8 +79,9 @@ e2TypeInst = MNEMONIC, RF_REG ;
 e3TypeInst = MNEMONIC, AC_REG ;
 e4TypeInst = MNEMONIC, RF_REG ;
 
-pseudoInst = jump ;
+pseudoInst = jump | mul | div | swap | lw | sw ;
 jump = "jump", (LABEL | NUMBER) ;
+mul = "mul", RF_REG, ",", RG_REG ;
 
 labelDec = LABEL, ':' ;
 
@@ -97,6 +98,8 @@ LABEL = ? _[a-z0-9_]* ? ;
 This grammar is defined using the Extended Backus-Naur Formalism (EBNF) with some terminals witted in Extended Regular Expressions (ERE) Syntax.
 
 #### Special Syntax Instructions
+
+##### Not Use All Fields in R-type Instructions
 
 Some R-type instructions don't use all available fields. For example, the `not` instruction only uses the a AC register and only one RF register. The syntax for these instructions is defined as follows:
 
@@ -137,6 +140,28 @@ E4-type:
 
 - jr
 - jral
+
+##### Pseudo-Instructions Syntax
+
+Pseudo-instructions are special commands that are used to simplify the writing of programs. They are not part of the MOOn IV ISA. The following pseudo-instructions are supported:
+
+- jump
+- lw
+- sw
+- mul
+- div
+- swap
+
+The syntax for these instructions is defined as follows:
+
+| Pseudo-Instruction | Syntax |
+|-|-|
+| jump | `jump, (LABEL \| NUMBER)` |
+| lw | `lw, AC_REG, ",", NUMBER` |
+| sw | `sw, AC_REG, ",", NUMBER` |
+| mul | `mul, RF_REG, ",", RG_REG` |
+| div | `div, RF_REG, ",", RG_REG` |
+| swap | `swap, RF_REG, ",", RG_REG` |
 
 <!-- todo: complete -->
 <!--  ## Structure of the Assembler -->
