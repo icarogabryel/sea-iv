@@ -346,6 +346,8 @@ class Parser:
                 return self.jump(tokenLexeme)
             case 'mul':
                 return self.mul(tokenLexeme)
+            case 'div':
+                return self.div(tokenLexeme)
             case _:
                 raise SyntacticError('How did you get here? :O - Please report this issue on GitHub.')
             
@@ -364,6 +366,15 @@ class Parser:
     
     def mul(self, lexeme) -> Node:
         node = Node('Pseudo Mul', lexeme)
+        self.advance()
+        node.addChild(self.rfReg())
+        self.matchLabel('comma')
+        node.addChild(self.rfReg())
+
+        return node
+    
+    def div(self, lexeme) -> Node:
+        node = Node('Pseudo Div', lexeme)
         self.advance()
         node.addChild(self.rfReg())
         self.matchLabel('comma')

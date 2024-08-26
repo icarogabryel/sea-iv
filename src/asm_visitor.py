@@ -189,6 +189,8 @@ class Visitor:
                         instBytes = self.pseudoJump(child)
                     case 'Pseudo Mul':
                         instBytes = self.pseudoMul(child)
+                    case 'Pseudo Div':
+                        instBytes = self.pseudoDiv(child)
 
                     # case 'E5 Type Inst': # todo: this will be a pseudo instruction
                     #     instBytes = self.e5TypeInst(child)
@@ -381,6 +383,30 @@ class Visitor:
         byteList2 = []
 
         for i in range(16):
+            byteList2.append(Byte(word5[:8]))
+            byteList2.append(Byte(word5[8:]))
+
+        return byteList1 + byteList2
+    
+    def pseudoDiv(self, node: Node):
+        rf1 = bin(self.rfReg(node.children[0]))[2:].zfill(4) # Dividend
+        rf2 = bin(self.rfReg(node.children[1]))[2:].zfill(4) # Divisor
+
+        word1 = '010011' + '00' + '0001' + '0000' # mtac ac1, rf0 - Move zero (Zero reg) to ac1
+        word2 = '010001' + '01' + '00000000'      # mth ac1 - Move zero to high (Clean high)
+        word3 = '010011' + '01' + rf1 + '0000'    # mtac ac1, rfx - Move the value of rfx to ac1
+        word4 = '001111' + '01' + '00000000'      # mtl ac1 - Move the value of ac1 to low
+
+        # In this point, the values of the operation are in the right place to do the division
+
+        word5 = '001101' + '00' + '0000' + rf2    # tmul rf2 - Make the test division 17x
+
+        byteList1 = [Byte(word1[:8]), Byte(word1[8:]), Byte(word2[:8]), Byte(word2[8:]),
+                     Byte(word3[:8]), Byte(word3[8:]), Byte(word4[:8]), Byte(word4[8:])]
+        
+        byteList2 = []
+
+        for i in range(17):
             byteList2.append(Byte(word5[:8]))
             byteList2.append(Byte(word5[8:]))
 

@@ -5,3 +5,4 @@
     addi &2, 20
     sll &2, $2, 4
     jump _start
+    div $2, $3
