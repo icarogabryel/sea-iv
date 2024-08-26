@@ -193,6 +193,8 @@ class Visitor:
                         instBytes = self.pseudoDiv(child)
                     case 'Pseudo Load':
                         instBytes = self.pseudoLoad(child)
+                    case 'Pseudo Store':
+                        instBytes = self.pseudoStore(child)
                     case _:
                         raise Exception('Dude, again, how did you get here? Please report this issue on GitHub.')
 
@@ -453,6 +455,47 @@ class Visitor:
 
         return [byte1, byte2, byte3, byte4, byte5, byte6, byte7,
                 byte8, byte9, byte10, byte11, byte12, byte13, byte14]
+    
+    def pseudoStore(self, node: Node):
+        ac = self.acReg(node.children[0])
+        pointer = self.label(node.children[1])
+        offset = self.number(node.children[2])
+
+        if ac == 1:
+            raise SemanticError('AC register 1 is reserved for the assembler.')
+
+        ac = bin(ac)[2:].zfill(2)
+
+        result1 = r'{' + f'{pointer};15-8' + r'}'
+        result2 = r'{' + f'{pointer};7-0' + r'}'
+
+        if int(offset) < 0 or int(offset) > 255:
+            raise SemanticError('Offset out of bounds. Must be between 0 and 255.')
+
+        offset = bin(offset)[2:].zfill(8)
+
+        word1 = '011111' + '01' + result1         # lui ac1, {bigger 8 bits of the number}
+        word2 = '011001' + '01' + result2         # ori ac1, {smaller 8 bits of the number}
+        word3 = '010011' + '01' + '0001' + '0000' # mtac ac1, rf1
+        word4 = '010110' + '01' + offset          # addi ac1, {offset}
+        word5 = '010100' + '01' + '0001' + '0000' # mfac ac1, rf1
+        word6 = '100000' + '01' + '0001' + '0000' # swr ac1, rf1, rf0
+
+        byte1 = Byte(word1[:8])
+        byte2 = Byte(word1[8:])
+        byte3 = Byte(word2[:8])
+        byte4 = Byte(word2[8:])
+        byte5 = Byte(word3[:8])
+        byte6 = Byte(word3[8:])
+        byte7 = Byte(word4[:8])
+        byte8 = Byte(word4[8:])
+        byte9 = Byte(word5[:8])
+        byte10 = Byte(word5[8:])
+        byte11 = Byte(word6[:8])
+        byte12 = Byte(word6[8:])
+
+        return [byte1, byte2, byte3, byte4, byte5, byte6,
+                byte7, byte8, byte9, byte10, byte11, byte12]
     
     def label(self, node: Node) -> str:
         return node.lexeme

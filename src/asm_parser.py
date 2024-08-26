@@ -350,6 +350,8 @@ class Parser:
                 return self.div(tokenLexeme)
             case 'lw':
                 return self.lw(tokenLexeme)
+            case 'sw':
+                return self.sw(tokenLexeme)
             case _:
                 raise SyntacticError('How did you get here? :O - Please report this issue on GitHub.')
             
@@ -386,6 +388,18 @@ class Parser:
     
     def lw(self, mnemonic) -> Node:
         node = Node('Pseudo Load', mnemonic)
+        self.advance()
+        node.addChild(self.acReg())
+        self.matchLabel('comma')
+        node.addChild(self.label())
+        self.matchLabel('lBracket')
+        node.addChild(self.number())
+        self.matchLabel('rBracket')
+
+        return node
+    
+    def sw(self, mnemonic) -> Node:
+        node = Node('Pseudo Store', mnemonic)
         self.advance()
         node.addChild(self.acReg())
         self.matchLabel('comma')

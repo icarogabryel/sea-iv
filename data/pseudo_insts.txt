@@ -2,3 +2,4 @@ jump
 mul
 div
 lw
+sw
