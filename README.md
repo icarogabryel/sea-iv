@@ -157,11 +157,13 @@ The syntax for these instructions is defined as follows:
 | Pseudo-Instruction | Syntax |
 |-|-|
 | jump | `jump, (LABEL \| NUMBER)` |
-| lw | `lw, AC_REG, ",", NUMBER` |
-| sw | `sw, AC_REG, ",", NUMBER` |
+| lw | `lw, AC_REG, ",", LABEL, "[", NUMBER, "]"` |
+| sw | `sw, AC_REG, ",", LABEL, "[", NUMBER, "]"` |
 | mul | `mul, RF_REG, ",", RG_REG` |
 | div | `div, RF_REG, ",", RG_REG` |
 | swap | `swap, RF_REG, ",", RG_REG` |
+| call | `call, LABEL` |
+| ret | `ret` |
 
 <!-- todo: complete -->
 <!--  ## Structure of the Assembler -->

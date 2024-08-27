@@ -195,6 +195,8 @@ class Visitor:
                         instBytes = self.pseudoLoad(child)
                     case 'Pseudo Store':
                         instBytes = self.pseudoStore(child)
+                    case 'Pseudo Swap':
+                        instBytes = self.swap(child)
                     case _:
                         raise Exception('Dude, again, how did you get here? Please report this issue on GitHub.')
 
@@ -476,10 +478,9 @@ class Visitor:
 
         word1 = '011111' + '01' + result1         # lui ac1, {bigger 8 bits of the number}
         word2 = '011001' + '01' + result2         # ori ac1, {smaller 8 bits of the number}
-        word3 = '010011' + '01' + '0001' + '0000' # mtac ac1, rf1
-        word4 = '010110' + '01' + offset          # addi ac1, {offset}
-        word5 = '010100' + '01' + '0001' + '0000' # mfac ac1, rf1
-        word6 = '100000' + '01' + '0001' + '0000' # swr ac1, rf1, rf0
+        word3 = '010110' + '01' + offset          # addi ac1, {offset}
+        word4 = '010100' + '01' + '0001' + '0000' # mfac ac1, rf1
+        word5 = '100000' + ac + '0001' + '0000'   # swr acx, rf1, rf0
 
         byte1 = Byte(word1[:8])
         byte2 = Byte(word1[8:])
@@ -491,11 +492,27 @@ class Visitor:
         byte8 = Byte(word4[8:])
         byte9 = Byte(word5[:8])
         byte10 = Byte(word5[8:])
-        byte11 = Byte(word6[:8])
-        byte12 = Byte(word6[8:])
 
-        return [byte1, byte2, byte3, byte4, byte5, byte6,
-                byte7, byte8, byte9, byte10, byte11, byte12]
+        return [byte1, byte2, byte3, byte4, byte5,
+                byte6, byte7, byte8, byte9, byte10,]
+    
+    def swap(self, node: Node) :
+        rf1 = self.rfReg(node.children[0])
+        rf2 = self.rfReg(node.children[1])
+
+        rfa = bin(rf1)[2:].zfill(4)
+        rfb = bin(rf2)[2:].zfill(4)
+
+        word1 = '010011' + '01' + rfa + '0000'    # mtac ac1, rfa - a are in ac1 now
+        word2 = '010100' + '01' + '0001' + '0000' # mfac ac1, rf1 - a are in rf1 now
+        word3 = '010011' + '01' + rfb + '0000'    # mtac ac1, rfb - b are in ac1 now
+        word4 = '010100' + '01' + rfa + '0000'    # mfac ac1, rfa - b are in a now
+        word5 = '010011' + '01' + '0001' + '0000' # mtac ac1, rf1 - a are in ac1 now
+        word6 = '010100' + '01' + rfb + '0000'    # mfac ac1, rfb - a are in b now
+
+        return [Byte(word1[:8]), Byte(word1[8:]), Byte(word2[:8]), Byte(word2[8:]),
+                Byte(word3[:8]), Byte(word3[8:]), Byte(word4[:8]), Byte(word4[8:]),
+                Byte(word5[:8]), Byte(word5[8:]), Byte(word6[:8]), Byte(word6[8:])]
     
     def label(self, node: Node) -> str:
         return node.lexeme

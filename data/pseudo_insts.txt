@@ -3,3 +3,4 @@ mul
 div
 lw
 sw
+swap
