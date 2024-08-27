@@ -196,7 +196,11 @@ class Visitor:
                     case 'Pseudo Store':
                         instBytes = self.pseudoStore(child)
                     case 'Pseudo Swap':
-                        instBytes = self.swap(child)
+                        instBytes = self.pseudoSwap(child)
+                    case 'Pseudo Call':
+                        instBytes = self.pseudoCall(child)
+                    case 'Pseudo Ret':
+                        instBytes = self.pseudoRet(child)
                     case _:
                         raise Exception('Dude, again, how did you get here? Please report this issue on GitHub.')
 
@@ -496,7 +500,7 @@ class Visitor:
         return [byte1, byte2, byte3, byte4, byte5,
                 byte6, byte7, byte8, byte9, byte10,]
     
-    def swap(self, node: Node) :
+    def pseudoSwap(self, node: Node) :
         rf1 = self.rfReg(node.children[0])
         rf2 = self.rfReg(node.children[1])
 
@@ -513,6 +517,33 @@ class Visitor:
         return [Byte(word1[:8]), Byte(word1[8:]), Byte(word2[:8]), Byte(word2[8:]),
                 Byte(word3[:8]), Byte(word3[8:]), Byte(word4[:8]), Byte(word4[8:]),
                 Byte(word5[:8]), Byte(word5[8:]), Byte(word6[:8]), Byte(word6[8:])]
+    
+    def pseudoCall(self, node: Node):
+        label = self.label(node.children[0])
+
+        result1 = r'{' + f'{label};15-8' + r'}'
+        result2 = r'{' + f'{label};7-0' + r'}'
+
+        word1 = '011111' + '01' + result1 # lui ac1, {bigger 8 bits of the number}
+        word2 = '011001' + '01' + result2 # ori ac1, {smaller 8 bits of the number}
+        word3 = '010100' + '01' + '0001' + '0000' # mfac ac1, rf1
+        word4 = '101000' + '00' + '0001' + '0000' # jal rf1
+
+        byte1 = Byte(word1[:8])
+        byte2 = Byte(word1[8:])
+        byte3 = Byte(word2[:8])
+        byte4 = Byte(word2[8:])
+        byte5 = Byte(word3[:8])
+        byte6 = Byte(word3[8:])
+        byte7 = Byte(word4[:8])
+        byte8 = Byte(word4[8:])
+
+        return [byte1, byte2, byte3, byte4, byte5, byte6, byte7, byte8]
+    
+    def pseudoRet(self, node: Node):
+        word1 = '101111' + '00' + '1111' + '0000' # ja sp
+
+        return [Byte(word1[:8]), Byte(word1[8:])]
     
     def label(self, node: Node) -> str:
         return node.lexeme

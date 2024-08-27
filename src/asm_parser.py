@@ -354,6 +354,10 @@ class Parser:
                 return self.sw(tokenLexeme)
             case 'swap':
                 return self.swap(tokenLexeme)
+            case 'call':
+                return self.call(tokenLexeme)
+            case 'ret':
+                return self.ret(tokenLexeme)
             case _:
                 raise SyntacticError('How did you get here? :O - Please report this issue on GitHub.')
             
@@ -418,6 +422,19 @@ class Parser:
         node.addChild(self.rfReg())
         self.matchLabel('comma')
         node.addChild(self.rfReg())
+
+        return node
+    
+    def call(self, mnemonic) -> Node:
+        node = Node('Pseudo Call', mnemonic)
+        self.advance()
+        node.addChild(self.label())
+
+        return node
+    
+    def ret(self, mnemonic) -> Node:
+        node = Node('Pseudo Ret', mnemonic)
+        self.advance()
 
         return node
 

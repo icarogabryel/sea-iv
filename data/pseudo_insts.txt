@@ -4,3 +4,5 @@ div
 lw
 sw
 swap
+call
+ret
