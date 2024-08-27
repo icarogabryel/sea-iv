@@ -24,6 +24,8 @@ Pseudo-instructions are special commands that are used to simplify the writing o
 - mul
 - div
 - swap
+- call
+- ret
 
 #### Directives
 
@@ -151,6 +153,8 @@ Pseudo-instructions are special commands that are used to simplify the writing o
 - mul
 - div
 - swap
+- call
+- ret
 
 The syntax for these instructions is defined as follows:
 
