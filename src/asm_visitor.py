@@ -541,7 +541,7 @@ class Visitor:
         return [byte1, byte2, byte3, byte4, byte5, byte6, byte7, byte8]
     
     def pseudoRet(self, node: Node):
-        word1 = '101111' + '00' + '1111' + '0000' # ja sp
+        word1 = '101111' + '00' + '1111' + '0000' # ja lk
 
         return [Byte(word1[:8]), Byte(word1[8:])]
     

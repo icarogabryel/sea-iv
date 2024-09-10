@@ -81,9 +81,16 @@ e2TypeInst = MNEMONIC, RF_REG ;
 e3TypeInst = MNEMONIC, AC_REG ;
 e4TypeInst = MNEMONIC, RF_REG ;
 
-pseudoInst = jump | mul | div | swap | lw | sw ;
+pseudoInst = jump | mul | div | swap | lw | sw | swap | call | ret ;
 jump = "jump", (LABEL | NUMBER) ;
 mul = "mul", RF_REG, ",", RG_REG ;
+div = "div", RF_REG, ",", RG_REG ;
+lw = "lw", AC_REG, ",", LABEL, "[", NUMBER, "]" ;
+sw = "sw", AC_REG, ",", LABEL, "[", NUMBER, "]" ;
+swap = "swap", RF_REG, ",", RG_REG ;
+call = "call", LABEL ;
+ret = "ret" ;
+
 
 labelDec = LABEL, ':' ;
 
